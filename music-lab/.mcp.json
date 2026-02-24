@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "~~knowledge base": {
+      "comment": "For track catalog storage. Example: Notion",
+      "command": "npx",
+      "args": ["-y", "@notionhq/notion-mcp-server"],
+      "env": {
+        "OPENAPI_MCP_HEADERS": "{\"Authorization\": \"Bearer YOUR_NOTION_TOKEN\"}"
+      }
+    }
+  },
+  "_note": "Most AI music tools (Suno, Udio) do not expose public APIs. Music Lab engineers prompts for manual use. When music generation APIs become available, add them here as ~~music generation."
+}

@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "~~knowledge base": {
+      "comment": "For brand documentation storage and retrieval. Example: Notion",
+      "command": "npx",
+      "args": ["-y", "@notionhq/notion-mcp-server"],
+      "env": {
+        "OPENAPI_MCP_HEADERS": "{\"Authorization\": \"Bearer YOUR_NOTION_TOKEN\"}"
+      }
+    },
+    "~~design": {
+      "comment": "For brand colors and typography from design system. Example: Figma",
+      "command": "npx",
+      "args": ["-y", "@figma/mcp-server"],
+      "env": {
+        "FIGMA_ACCESS_TOKEN": "YOUR_FIGMA_TOKEN"
+      }
+    }
+  }
+}

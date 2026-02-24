@@ -1,0 +1,29 @@
+{
+  "mcpServers": {
+    "~~knowledge base": {
+      "comment": "For product specs, PRDs, architecture decisions. Example: Notion",
+      "command": "npx",
+      "args": ["-y", "@notionhq/notion-mcp-server"],
+      "env": {
+        "OPENAPI_MCP_HEADERS": "{\"Authorization\": \"Bearer YOUR_NOTION_TOKEN\"}"
+      }
+    },
+    "~~chat": {
+      "comment": "For launch announcements and deploy notifications. Example: Slack",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-slack"],
+      "env": {
+        "SLACK_BOT_TOKEN": "YOUR_SLACK_BOT_TOKEN",
+        "SLACK_TEAM_ID": "YOUR_SLACK_TEAM_ID"
+      }
+    },
+    "~~email marketing": {
+      "comment": "For waitlist and launch notifications. Example: Resend",
+      "command": "npx",
+      "args": ["-y", "resend-mcp"],
+      "env": {
+        "RESEND_API_KEY": "YOUR_RESEND_API_KEY"
+      }
+    }
+  }
+}

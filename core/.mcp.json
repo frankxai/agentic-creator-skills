@@ -1,0 +1,21 @@
+{
+  "mcpServers": {
+    "~~knowledge base": {
+      "comment": "Replace with your knowledge base MCP server. Example: Notion",
+      "command": "npx",
+      "args": ["-y", "@notionhq/notion-mcp-server"],
+      "env": {
+        "OPENAPI_MCP_HEADERS": "{\"Authorization\": \"Bearer YOUR_NOTION_TOKEN\"}"
+      }
+    },
+    "~~chat": {
+      "comment": "Replace with your chat MCP server. Example: Slack",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-slack"],
+      "env": {
+        "SLACK_BOT_TOKEN": "YOUR_SLACK_BOT_TOKEN",
+        "SLACK_TEAM_ID": "YOUR_SLACK_TEAM_ID"
+      }
+    }
+  }
+}

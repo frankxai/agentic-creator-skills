@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "~~image generation": {
+      "comment": "Replace with your image generation MCP. Default: Gemini 2.5 Flash Image via nano-banana",
+      "command": "node",
+      "args": ["PATH_TO_NANO_BANANA_MCP/build/index.js"],
+      "env": {
+        "GEMINI_API_KEY": "YOUR_GEMINI_API_KEY"
+      }
+    },
+    "~~design": {
+      "comment": "Replace with your design tool MCP. Example: Figma",
+      "command": "npx",
+      "args": ["-y", "@figma/mcp-server"],
+      "env": {
+        "FIGMA_ACCESS_TOKEN": "YOUR_FIGMA_TOKEN"
+      }
+    }
+  }
+}

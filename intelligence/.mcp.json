@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "~~memory": {
+      "comment": "For persistent cross-session memory storage. Example: mcp-memory",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"]
+    },
+    "~~chat": {
+      "comment": "For weekly intelligence digests and score alerts. Example: Slack",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-slack"],
+      "env": {
+        "SLACK_BOT_TOKEN": "YOUR_SLACK_BOT_TOKEN",
+        "SLACK_TEAM_ID": "YOUR_SLACK_TEAM_ID"
+      }
+    }
+  },
+  "_note": "The intelligence plugin primarily reads local .claude/trajectories/ and .claude-flow/ files. MCP servers are optional — they add reporting and notification capability."
+}
