@@ -1,0 +1,8 @@
+{
+  "name": "design-excellence",
+  "version": "1.0.0",
+  "description": "Design system governance, component engineering, and visual quality enforcement. 5-specialist design swarm: design system architect, component engineer, QA validator, visual director, and Figma integration. Enforces token compliance, accessibility (WCAG 2.2), M3+Apple HIG motion, glassmorphism standards, and brand consistency across all UI work.",
+  "author": {
+    "name": "frankxai"
+  }
+}
