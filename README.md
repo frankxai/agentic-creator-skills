@@ -1,6 +1,85 @@
-> **Note:** This repository contains Anthropic's implementation of skills for Claude. For information about the Agent Skills standard, see [agentskills.io](http://agentskills.io).
+# Agentic Creator Skills
 
-# Skills
+**ACOS — Agentic Creator OS.** Modular plugin system for independent creators, personal brands, and creative businesses. Also includes the original Anthropic agent skills library.
+
+---
+
+## Install ACOS Plugins
+
+```bash
+claude plugin marketplace add frankxai/agentic-creator-skills
+```
+
+### Full ACOS (everything):
+```bash
+claude plugin install core content-engine visual-studio music-lab brand-architect product-launcher intelligence@agentic-creator-skills
+```
+
+### Minimal setup (workspace + content):
+```bash
+claude plugin install core content-engine brand-architect@agentic-creator-skills
+```
+
+### Single module:
+```bash
+claude plugin install music-lab@agentic-creator-skills
+```
+
+**After installing core, run:** `/creator-sprint`
+
+---
+
+## ACOS Plugins
+
+| Plugin | What it does | Key commands |
+|--------|-------------|--------------|
+| `core` | Workspace memory, task management, session structure | `/creator-sprint`, `/acos-score` |
+| `content-engine` | Blog posts, social, newsletters, video scripts | `/create-content`, `/content-review`, `/generate-newsletter` |
+| `visual-studio` | On-brand image generation with 7-gate quality filter | `/create-visual` |
+| `music-lab` | Suno prompt engineering, style consistency | `/create-music` |
+| `brand-architect` | Brand voice documentation and enforcement | `/brand-voice-check` |
+| `product-launcher` | Spec → build → QA → ship → retro pipeline | `/product-spec`, `/product-sprint`, `/product-deploy`, `/product-retro` |
+| `intelligence` | Pattern tracking, learning report, ACOS score | `/intelligence-report` |
+
+### How It Works
+
+Each plugin is a vertical slice of creator capability:
+- `skills/` — domain expertise, loaded when relevant tasks are detected
+- `commands/` — slash commands with full, executable workflows
+- `CONNECTORS.md` — `~~category` placeholders for tool-agnostic integrations
+
+**Progressive disclosure**: Lean SKILL.md (<3K words) + `references/` subdirectories for deep content loaded on demand.
+
+**Memory system**: `core` sets up a two-tier memory system:
+- `CREATOR.md` — hot cache (~80 lines, covers 90% of sessions)
+- `creator-memory/` — deep documentation (voice, visual, music, projects, content catalog)
+
+---
+
+## Update
+
+```bash
+claude plugin marketplace update agentic-creator-skills
+claude plugin update core@agentic-creator-skills
+```
+
+---
+
+## Anthropic Agent Skills (original)
+
+This repo also contains the original Anthropic agent skills library:
+
+```bash
+claude plugin install example-skills@agentic-creator-skills
+claude plugin install document-skills@agentic-creator-skills
+```
+
+> For information about the Agent Skills standard, see [agentskills.io](http://agentskills.io).
+
+---
+
+# Skills (Anthropic original)
+
 Skills are folders of instructions, scripts, and resources that Claude loads dynamically to improve performance on specialized tasks. Skills teach Claude how to complete specific tasks in a repeatable way, whether that's creating documents with your company's brand guidelines, analyzing data using your organization's specific workflows, or automating personal tasks.
 
 For more information, check out:

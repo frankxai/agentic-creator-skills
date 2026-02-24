@@ -1,14 +1,45 @@
 {
-  "name": "anthropic-agent-skills",
+  "name": "agentic-creator-skills",
+  "description": "ACOS — Agentic Creator OS. Modular plugins for independent creators, personal brands, and creative businesses. Content engine, visual studio, music lab, brand voice, product launching, and intelligence systems.",
   "owner": {
-    "name": "Keith Lazuka",
-    "email": "klazuka@anthropic.com"
-  },
-  "metadata": {
-    "description": "Anthropic example skills",
-    "version": "1.0.0"
+    "name": "frankxai"
   },
   "plugins": [
+    {
+      "name": "core",
+      "source": "./core",
+      "description": "ACOS core — workspace memory (CREATOR.md + creator-memory/), task management (TASKS.md), creator-sprint initialization, and ACOS score reporting. Install this first."
+    },
+    {
+      "name": "content-engine",
+      "source": "./content-engine",
+      "description": "Voice-consistent content creation across blog posts, social media, newsletters, and video scripts. Multi-channel format rules, repurposing workflows, SEO checklist, and newsletter generation."
+    },
+    {
+      "name": "visual-studio",
+      "source": "./visual-studio",
+      "description": "Style-governed image generation with 7-gate quality filter. Visual style DNA management, prompt engineering for all major AI image tools, and image catalog."
+    },
+    {
+      "name": "music-lab",
+      "source": "./music-lab",
+      "description": "AI music generation pipeline. Suno-compatible prompt engineering, style consistency across tracks, music purpose framework, and track catalog."
+    },
+    {
+      "name": "brand-architect",
+      "source": "./brand-architect",
+      "description": "Brand voice system — define, document, and enforce consistent voice. Voice attribute framework, tone-by-channel rules, terminology management, and voice drift detection."
+    },
+    {
+      "name": "product-launcher",
+      "source": "./product-launcher",
+      "description": "Creator product development and shipping. Spec writing, build sprints, QA process, deployment workflow, and post-launch retrospectives for digital products."
+    },
+    {
+      "name": "intelligence",
+      "source": "./intelligence",
+      "description": "ACOS intelligence and learning system. Session pattern tracking, skill activation scoring, trajectory learning, and full intelligence report."
+    },
     {
       "name": "document-skills",
       "description": "Collection of document processing suite including Excel, Word, PowerPoint, and PDF capabilities",

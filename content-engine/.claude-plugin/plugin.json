@@ -1,0 +1,8 @@
+{
+  "name": "content-engine",
+  "version": "1.0.0",
+  "description": "Voice-consistent content creation across blog posts, social media, newsletters, and video scripts. Multi-channel format rules, repurposing workflows, SEO checklist, and newsletter generation. Requires voice config from core plugin.",
+  "author": {
+    "name": "frankxai"
+  }
+}

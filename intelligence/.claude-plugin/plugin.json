@@ -1,0 +1,8 @@
+{
+  "name": "intelligence",
+  "version": "1.0.0",
+  "description": "ACOS intelligence and learning system. Session pattern tracking, skill activation scoring, trajectory learning, intelligence score reporting. Measures system improvement over time and surfaces the most effective workflows.",
+  "author": {
+    "name": "frankxai"
+  }
+}

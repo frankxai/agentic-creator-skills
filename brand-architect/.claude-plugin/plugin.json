@@ -1,0 +1,8 @@
+{
+  "name": "brand-architect",
+  "version": "1.0.0",
+  "description": "Brand voice system — define, document, and enforce consistent voice across all content. Voice attribute framework, tone-by-channel rules, terminology management, voice drift detection, and derivation from writing samples.",
+  "author": {
+    "name": "frankxai"
+  }
+}

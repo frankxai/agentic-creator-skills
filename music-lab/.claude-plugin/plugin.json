@@ -1,0 +1,8 @@
+{
+  "name": "music-lab",
+  "version": "1.0.0",
+  "description": "AI music generation pipeline for creators. Suno-compatible prompt engineering, style consistency across tracks, music purpose framework, track catalog, and quality checks. Works with Suno and compatible AI music tools.",
+  "author": {
+    "name": "frankxai"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "name": "visual-studio",
+  "version": "1.0.0",
+  "description": "Style-governed image generation with 7-gate quality filter. Visual style DNA management, prompt engineering for all major AI image tools, council-review process, and image catalog. Works with any connected image generation tool.",
+  "author": {
+    "name": "frankxai"
+  }
+}

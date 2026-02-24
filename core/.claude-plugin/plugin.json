@@ -1,0 +1,8 @@
+{
+  "name": "core",
+  "version": "1.0.0",
+  "description": "ACOS core — session management, workspace memory, task tracking, and system intelligence. Install first. Provides creator-sprint setup, ACOS score reporting, and the two-tier memory system used by all other plugins.",
+  "author": {
+    "name": "frankxai"
+  }
+}
