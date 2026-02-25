@@ -1,0 +1,95 @@
+name: Plugin Quality Gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 7 * * 1'
+  workflow_dispatch:
+
+jobs:
+  validate-plugins:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate all plugins
+        run: |
+          ERRORS=0
+          WARNINGS=0
+
+          for manifest in $(find . -name "plugin.json" -path "*/.claude-plugin/*" | sort); do
+            PLUGIN_DIR=$(echo "$manifest" | sed 's|/\.claude-plugin/plugin.json||; s|^\./||')
+            echo "=== Validating: $PLUGIN_DIR ==="
+
+            # Validate JSON
+            if ! python3 -c "import json; json.load(open('$manifest'))" 2>/dev/null; then
+              echo "  ERROR: Invalid JSON in plugin.json"
+              ERRORS=$((ERRORS + 1))
+              continue
+            fi
+
+            # Check required fields
+            for field in name version description; do
+              VAL=$(python3 -c "import json; print(json.load(open('$manifest')).get('$field', ''))")
+              if [ -z "$VAL" ]; then
+                echo "  ERROR: Missing '$field'"
+                ERRORS=$((ERRORS + 1))
+              else
+                echo "  OK: $field = $VAL"
+              fi
+            done
+
+            # Check CONNECTORS.md
+            if [ ! -f "$PLUGIN_DIR/CONNECTORS.md" ]; then
+              echo "  WARN: Missing CONNECTORS.md"
+              WARNINGS=$((WARNINGS + 1))
+            fi
+
+            # Check skills exist
+            SKILL_COUNT=$(find "$PLUGIN_DIR/skills" -name "SKILL.md" 2>/dev/null | wc -l)
+            CMD_COUNT=$(find "$PLUGIN_DIR/commands" -name "*.md" 2>/dev/null | wc -l)
+            if [ "$SKILL_COUNT" -eq 0 ] && [ "$CMD_COUNT" -eq 0 ]; then
+              echo "  ERROR: No skills or commands found"
+              ERRORS=$((ERRORS + 1))
+            else
+              echo "  OK: $SKILL_COUNT skill(s), $CMD_COUNT command(s)"
+            fi
+
+            # Validate SKILL.md word count
+            find "$PLUGIN_DIR/skills" -name "SKILL.md" 2>/dev/null | while read -r skill; do
+              SNAME=$(dirname "$skill" | xargs basename)
+              WORDS=$(wc -w < "$skill")
+              if [ "$WORDS" -lt 50 ]; then
+                echo "  WARN: $SNAME — $WORDS words (likely stub)"
+              elif [ "$WORDS" -gt 5000 ]; then
+                echo "  WARN: $SNAME — $WORDS words (may be too large to load)"
+              fi
+            done
+
+            echo ""
+          done
+
+          echo "================================="
+          echo "RESULTS: $ERRORS errors, $WARNINGS warnings"
+          if [ "$ERRORS" -gt 0 ]; then
+            exit 1
+          fi
+
+      - name: Generate inventory
+        if: always()
+        run: |
+          echo "# Plugin Inventory" > /tmp/inventory.md
+          echo "| Plugin | Version | Skills | Commands |" >> /tmp/inventory.md
+          echo "|--------|---------|--------|----------|" >> /tmp/inventory.md
+          for m in $(find . -name "plugin.json" -path "*/.claude-plugin/*" | sort); do
+            DIR=$(echo "$m" | sed 's|/\.claude-plugin/plugin.json||; s|^\./||')
+            NAME=$(python3 -c "import json; print(json.load(open('$m')).get('name','?'))")
+            VER=$(python3 -c "import json; print(json.load(open('$m')).get('version','?'))")
+            SK=$(find "$DIR/skills" -name "SKILL.md" 2>/dev/null | wc -l)
+            CM=$(find "$DIR/commands" -name "*.md" 2>/dev/null | wc -l)
+            echo "| $NAME | $VER | $SK | $CM |" >> /tmp/inventory.md
+          done
+          cat /tmp/inventory.md
