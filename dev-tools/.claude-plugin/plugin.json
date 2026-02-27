@@ -1,0 +1,8 @@
+{
+  "name": "dev-tools",
+  "version": "1.0.0",
+  "description": "Developer tooling for disk management, dependency auditing, and local environment hygiene. Includes WSL-aware storage intelligence with 3-lens safety council. First plugin in the dev-tools family — more tools coming.",
+  "author": {
+    "name": "frankxai"
+  }
+}
