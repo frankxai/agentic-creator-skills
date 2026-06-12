@@ -14,14 +14,16 @@ Write in a consistent voice — not just tone, but the specific fingerprint of h
 
 A creator's voice stays consistent across channels. Tone adapts: more formal on LinkedIn, punchier on X, warmer in email.
 
-## Voice Loading Priority
+## Voice Loading
 
+Before writing, check for voice config in this order:
 1. `CREATOR.md` — voice section (quick ref, covers 90% of cases)
 2. `creator-memory/voice.md` — full documentation with examples
-3. Project `CLAUDE.md` — look for "Brand Positioning" or "Voice" section
-4. If none found: ask the user, or run `/creator-sprint`
+3. If neither exists: ask user to describe their voice, or offer to initialize
 
 ## The 5 Voice Components
+
+A complete voice profile covers:
 
 ### 1. Voice Attributes (3-5 maximum)
 Each attribute defined as:
@@ -30,6 +32,12 @@ Each attribute defined as:
 - **Sounds like**: example sentence
 - **Never sounds like**: anti-example
 
+Example for "Cool Authority":
+- **We are**: confident, precise, lets the work speak
+- **We are not**: arrogant, dismissive, or name-dropping
+- **Sounds like**: "[Specific result]. Here's what that teaches you about [topic]."
+- **Never sounds like**: "As a top AI architect, I know better than most that..."
+
 ### 2. Audience Definition
 - Who the primary audience is
 - What they already know (don't over-explain)
@@ -37,14 +45,15 @@ Each attribute defined as:
 - How they expect to be addressed (peer, student, collaborator)
 
 ### 3. Content Pillars
-3-5 core themes the creator consistently covers. Every piece should belong to one.
+3-5 core themes the creator consistently covers. Every piece of content should belong to one. Defined with topic focus, audience, and core argument.
 
 ### 4. Tone Adaptation Rules
+How the voice shifts by context while staying recognizably consistent.
 
 | Channel | Tone shift | Example |
 |---------|-----------|---------|
-| Long-form blog | Educational, complete, evidence-based | Full arguments, conclusions |
-| LinkedIn | Professional, thought-provoking, personal | First-person insight |
+| Long-form blog | Educational, complete, evidence-based | Full arguments, examples, conclusions |
+| LinkedIn | Professional, thought-provoking, personal | First-person insight, business framing |
 | X/Twitter | Direct, punchy, opinionated | Short sentences, bold claims |
 | Email | Personal, warm, action-oriented | "You" framing, clear next step |
 | Video | Conversational, energetic | Shorter sentences, visual language |
@@ -53,18 +62,19 @@ Each attribute defined as:
 Preferred and avoided terms. Examples:
 - "creators" not "influencers"
 - "ships" not "launches" (for product releases)
-- Never: spiritual language, guru tone, lazy CTAs
+- "AI music" not "generated music"
+- Never: spiritual language, guru tone, lazy CTAs ("drop a comment below")
 
 ## Applying Voice to Content
 
-1. Read voice attributes from CREATOR.md
+When writing, run this checklist:
+1. Read the voice attributes from CREATOR.md
 2. Draft the opener — rewrite until it sounds like the creator
 3. Check for anti-patterns (things this creator never says)
-4. Verify tone matches channel rules
+4. Verify tone matches the channel rules
 5. Check terminology — any flagged words used?
 
-## Red Flags Requiring Revision
-
+**Red flags requiring revision:**
 - Opener starts with "I" (usually weak, unless intentional personal story)
 - More than one "!" in a piece
 - "Amazing", "awesome", "incredible" (generic, not precise)
@@ -72,4 +82,12 @@ Preferred and avoided terms. Examples:
 - Passive voice where active works better
 - Hedging: "I think", "maybe", "possibly" (unless intentional)
 
-See `references/voice-frameworks.md` for the full voice documentation template and derivation guide.
+## Loading Voice Config
+
+Check for voice documentation in this priority order:
+1. `CREATOR.md` in the current project (hot cache — covers 90% of requests)
+2. `creator-memory/voice.md` in the current project (full documentation)
+3. Project `CLAUDE.md` — look for a "Brand Positioning" or "Voice" section
+4. If none found: ask the user to describe their voice, or run `/creator-sprint`
+
+See `references/voice-frameworks.md` for the full voice documentation template and attribute definition system.
