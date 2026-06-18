@@ -3,3 +3,12 @@ __pycache__/
 .idea/
 .vscode/
 
+
+# Starlight/ACOS temporary files
+.agent/
+*.log
+.system_generated/
+.next-backup/
+temp-*.json
+link-checker-report.json
+link-checker-report.txt
