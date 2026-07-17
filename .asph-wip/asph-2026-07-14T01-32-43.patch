@@ -1,0 +1,105 @@
+diff --git a/.asph-wip/asph-2026-07-07T23-35-24.patch b/.asph-wip/asph-2026-07-07T23-35-24.patch
+new file mode 100644
+index 0000000..eade4b0
+--- /dev/null
++++ b/.asph-wip/asph-2026-07-07T23-35-24.patch
+@@ -0,0 +1,99 @@
++diff --git a/.agent-harness.json b/.agent-harness.json
++new file mode 100644
++index 0000000..79e126b
++--- /dev/null
+++++ b/.agent-harness.json
++@@ -0,0 +1,45 @@
+++﻿{
+++    "name":  "agentic-creator-skills",
+++    "classification":  "agent-substrate",
+++    "owner":  "FrankX AI",
+++    "updated":  "2026-06-19",
+++    "remote":  "https://github.com/frankxai/agentic-creator-skills.git",
+++    "health":  {
+++                   "primaryCheck":  "git status",
+++                   "manualChecks":  [
+++                                        "Review AGENTS.md before edits",
+++                                        "Preserve user work and dirty files",
+++                                        "Scan public outputs for secrets and private memory"
+++                                    ]
+++               },
+++    "agentGuidance":  {
+++                          "readAgentsMd":  true,
+++                          "avoidPrivateMemory":  true,
+++                          "preserveExistingConventions":  true,
+++                          "designTasteKernel":  {
+++                                                    "enabled":  true,
+++                                                    "root":  "C:\\Users\\frank\\starlight\\repos",
+++                                                    "files":  [
+++                                                                  "C:\\Users\\frank\\starlight\\repos\\DESIGN_TASTE.md",
+++                                                                  "C:\\Users\\frank\\starlight\\repos\\WEB_EXPERIENCE_STANDARD.md",
+++                                                                  "C:\\Users\\frank\\starlight\\repos\\MOTION_TASTE_RUBRIC.md",
+++                                                                  "C:\\Users\\frank\\starlight\\repos\\MULTI_AGENT_DESIGN_COUNCIL.md",
+++                                                                  "C:\\Users\\frank\\starlight\\repos\\VISUAL_QA_GATE.md"
+++                                                              ],
+++                                                    "appliesTo":  [
+++                                                                      "site",
+++                                                                      "app",
+++                                                                      "landing-page",
+++                                                                      "dashboard",
+++                                                                      "visual-identity",
+++                                                                      "brand",
+++                                                                      "motion",
+++                                                                      "media",
+++                                                                      "social",
+++                                                                      "frontend"
+++                                                                  ],
+++                                                    "motionPlugin":  "motion-design-studio",
+++                                                    "visualVerificationRequired":  true
+++                                                }
+++                      }
+++}
++diff --git a/AGENTS.md b/AGENTS.md
++new file mode 100644
++index 0000000..0e81477
++--- /dev/null
+++++ b/AGENTS.md
++@@ -0,0 +1,42 @@
+++﻿# Repository Instructions
+++
+++This repo is part of the FrankX / Starlight / Arcanea agent estate.
+++
+++## Classification
+++
+++- Repo: $title
+++- Class: $Classification
+++- Default health command: $HealthCommand
+++- Remote: $Remote
+++
+++## Agent Rules
+++
+++- Read this file before making changes.
+++- Preserve existing user work and unrelated dirty files.
+++- Keep edits scoped to the requested task.
+++- Prefer existing repo conventions over new abstractions.
+++- Run the health command before handoff when feasible.
+++- Do not publish secrets, private memory, credentials, or internal-only strategy.
+++
+++## Class-Specific Guidance
+++
+++- Preserve skill/plugin/MCP schemas and frontmatter.
+++- Validate skills, manifests, scripts, and generated registries after edits.
+++- Keep public/private memory boundaries explicit.
+++
+++## Handoff
+++
+++Summarize changed files, validation run, risks, and any follow-up needed.
+++
+++## Design Taste Kernel
+++
+++For any site, app, landing page, dashboard, visual identity, brand, motion, media, social, or frontend task, apply the shared Design Taste Kernel before handoff:
+++
+++- C:\Users\frank\starlight\repos\DESIGN_TASTE.md
+++- C:\Users\frank\starlight\repos\WEB_EXPERIENCE_STANDARD.md
+++- C:\Users\frank\starlight\repos\MOTION_TASTE_RUBRIC.md
+++- C:\Users\frank\starlight\repos\MULTI_AGENT_DESIGN_COUNCIL.md
+++- C:\Users\frank\starlight\repos\VISUAL_QA_GATE.md
+++
+++When motion, scroll, generated media, GIF/video, or premium polish matters, route through the Motion Design Studio plugin/skills and verify the result visually.
+++
