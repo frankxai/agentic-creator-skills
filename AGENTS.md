@@ -4,10 +4,10 @@ This repo is part of the FrankX / Starlight / Arcanea agent estate.
 
 ## Classification
 
-- Repo: $title
-- Class: $Classification
-- Default health command: $HealthCommand
-- Remote: $Remote
+- Repo: agentic-creator-skills
+- Class: public Claude Code plugin marketplace (ACOS — Agentic Creator OS)
+- Default health command: manual SKILL.md frontmatter + link pass (no scripts/validate-skills.mjs in this repo)
+- Remote: https://github.com/frankxai/agentic-creator-skills.git
 
 ## Agent Rules
 

@@ -21,7 +21,7 @@ Define before building. A good spec answers:
 - **Problem**: What specific pain does this solve? Who has it?
 - **Solution**: What does the product do? What are the boundaries (what it explicitly doesn't do)?
 - **Audience**: Who is the primary buyer/user?
-- **Value ladder**: Where does this sit? (free tool / $27 template / $97 product / $297 system)
+- **Value ladder**: Where does this sit? (free tool / USD 27 template / USD 97 product / USD 297 system)
 - **Distribution**: How does the creator reach buyers? (email list, social, SEO, marketplace)
 - **Success metric**: What makes this product worth shipping?
 
@@ -91,17 +91,17 @@ After 30 days (or on request):
 
 | Type | Build time | Price range | Distribution |
 |------|-----------|-------------|--------------|
-| Template | 1-3 days | $7-47 | Gumroad, Etsy, own shop |
-| Micro-tool | 3-7 days | Free or $9-27 | Product Hunt, social |
-| Course | 2-4 weeks | $47-297 | Email list, SEO |
-| Agent/system | 1-4 weeks | $97-697 | Direct, community |
+| Template | 1-3 days | USD 7-47 | Gumroad, Etsy, own shop |
+| Micro-tool | 3-7 days | Free or USD 9-27 | Product Hunt, social |
+| Course | 2-4 weeks | USD 47-297 | Email list, SEO |
+| Agent/system | 1-4 weeks | USD 97-697 | Direct, community |
 | SaaS | Ongoing | Subscription | SEO, ads |
 
 ## Pricing Principles
 
 - **Free tools**: Distribution engine. Collect emails. Upsell to paid.
-- **Low price ($7-47)**: Remove friction. Don't over-scope. Ship fast.
-- **Mid price ($47-147)**: Needs clear outcome promise. 10x value rule.
-- **High price ($147-697)**: Systems that save 10+ hours or make 10x the cost back. Need trust built first.
+- **Low price (USD 7-47)**: Remove friction. Don't over-scope. Ship fast.
+- **Mid price (USD 47-147)**: Needs clear outcome promise. 10x value rule.
+- **High price (USD 147-697)**: Systems that save 10+ hours or make 10x the cost back. Need trust built first.
 
 See `references/product-playbook.md` for full product development patterns.
