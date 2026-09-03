@@ -1,61 +1,120 @@
 ---
-description: Write content in the creator's voice — blog posts, social posts, newsletters, video scripts, threads
-argument-hint: "<topic, repurpose request, or content type+angle>"
+description: Write commissioned content in the creator's voice — blog posts, social posts, newsletters, video scripts, and threads
+argument-hint: "<topic, commission packet, repurpose request, or content type+angle>"
 ---
 
 # /create-content
 
-> See [CONNECTORS.md](../CONNECTORS.md) for publishing and knowledge base integrations.
+> See [CONNECTORS.md](../CONNECTORS.md) for publishing and knowledge-base integrations.
 
 ## Workflow
 
-### Step 1: Understand the Request
+### Step 1: Classify the Request
 
-Parse the argument:
-- **Topic + format**: "LinkedIn post about [topic]" → write it
-- **Repurpose request**: "Turn this blog post into [format]" → adapt it
-- **Just a topic**: "Write about [topic]" → ask which format
-- **No argument**: Ask: "What do you want to create, and what format? (blog, LinkedIn, X, email, video script)"
+Parse the argument and route it before writing:
 
-### Step 2: Load Voice
+- **Durable search page, long-tail SEO page, pillar page, comparison page, or topic cluster** → run `/build-search-authority` first. Continue only when the page has a `PASS` commission packet.
+- **Existing approved brief or commission packet** → proceed with the defined reader job, evidence, artifact, and action.
+- **Repurpose request** → adapt the source idea and evidence to the destination channel.
+- **Campaign, social, email, newsletter, or script request** → proceed when audience, purpose, and source material are clear.
+- **Uncommissioned generic article request** → establish the reader job, differentiated thesis, evidence, original value, and primary action before drafting.
 
-Check for voice config in order:
-1. `CREATOR.md` — voice section (covers 90% of cases)
-2. `creator-memory/voice.md` — full documentation
-3. Project `CLAUDE.md` — "Brand Positioning" or "Voice" section
-4. If none: ask "Should I write in a neutral voice, or describe your style first?"
+A keyword is not a brief. Do not manufacture pages merely because a query variant exists.
 
-Also load channel-specific rules from `creator-memory/channels.md` if it exists.
+### Step 2: Load Voice and Brand Context
 
-If `~~knowledge base` connected: check for related drafts or previous content on this topic.
+Check in this order:
 
-### Step 3: Clarify if Needed
+1. `CREATOR.md` — active voice and positioning
+2. `creator-memory/voice.md` — deeper voice documentation
+3. Project `CLAUDE.md` — brand positioning, audience, language, and quality rules
+4. `creator-memory/channels.md` — channel-specific constraints when present
 
-If anything is ambiguous, ask one focused question before writing. Don't ask multiple questions.
+If no voice documentation exists, ask whether to use a neutral voice or initialize the creator profile.
 
-Common clarifications:
-- "Is this from personal experience, or a general take?"
-- "Which audience is this for — [audience A] or [audience B]?"
-- "What's the one thing you want them to take away?"
+When a `~~knowledge base` is connected, inspect related drafts, published work, products, research, and evidence before creating new material.
 
-### Step 4: Write
+### Step 3: Resolve the Commission
 
-Apply the content-creation skill:
-- Voice layer: apply voice attributes from CREATOR.md
-- Format layer: apply format rules for the specific channel
-- Quality check: verify opener strength, voice match, format fit, single purpose, specificity
+Before drafting, confirm the piece has:
 
-For repurposing: follow the repurposing workflow in content-creation skill, adapting to the target format.
+- one audience and reader job
+- one primary purpose
+- a defensible thesis or useful angle
+- inspectable evidence or clearly bounded opinion
+- an original artifact, example, framework, demonstration, or decision aid when the format warrants it
+- one primary action that continues the reader's job
+- a destination channel and success signal
 
-### Step 5: Deliver with Options
+For search-targeted content, these must come from the approved search-authority packet. Do not silently invent them.
 
-Present the content, then offer:
-- "Want me to write a [related format] version of this?"
-- "Should I add a visual prompt for this piece?"
-- "Want to review this against your voice standards? Run `/content-review`."
+### Step 4: Build the Evidence and Structure
 
-If the piece is for a blog: offer to generate meta title/description and FAQ section for SEO.
+Create a compact working packet:
 
-### Step 6: Save to Catalog (optional)
+```text
+Audience:
+Reader job:
+Thesis:
+Evidence:
+Original value:
+Structure:
+Primary action:
+Success signal:
+```
 
-If `creator-memory/content/` exists, offer to log: title, format, channel, date, status (draft/published).
+Map factual claims to trustworthy or first-party sources. Mark uncertainty. Never fabricate personal experience, benchmarks, traffic, customer results, or tool behavior.
+
+### Step 5: Write
+
+Apply the `content-creation` skill:
+
+- commission layer: satisfy the reader job and artifact contract
+- voice layer: apply the active creator and brand voice
+- format layer: use native channel structure and pacing
+- evidence layer: preserve claim provenance
+- conversion layer: make the next action a natural continuation
+
+For repurposing, transform the angle, opening, pacing, examples, and action for the destination channel rather than copying the source structure.
+
+### Step 6: Review Independently
+
+Run a distinct review pass for:
+
+1. commission match
+2. claim integrity and uncertainty
+3. voice and human texture
+4. channel fit and opening strength
+5. distinct value
+6. commercial continuity
+7. search implementation when applicable
+8. maintenance and refresh fitness
+
+For substantial or search-targeted work, route through `/content-review` before publication.
+
+### Step 7: Deliver the Production Packet
+
+Return:
+
+- final draft
+- title or hook alternatives only when they serve a concrete test
+- source and claim notes
+- original artifact or visual requirements
+- metadata and technical requirements when applicable
+- primary action
+- distribution derivatives
+- unresolved risks or approvals
+
+Do not add generic offers for more content. End with the next decision or production action already implied by the brief.
+
+### Step 8: Save and Route
+
+When the workspace provides a canonical content system:
+
+- update the existing content record instead of creating a parallel tracker
+- attach the brief, draft, sources, status, owner, review state, target date, and live URL
+- route code-backed content through a repository branch and pull request
+- require rendered preview evidence before production publication
+- schedule the relevant learning window after release
+
+Publication authority remains separate from drafting authority.
