@@ -117,25 +117,40 @@ function validateTextBoxPosition(slideData, bodyDimensions) {
   return errors;
 }
 
+// Helper: resolve an <img> source to a local path confined under the deck's own
+// directory. Untrusted HTML would otherwise embed any readable file (or beacon a
+// remote URL) into the generated PPTX.
+function resolveImagePath(src, rootDir) {
+  if (/^https?:\/\//i.test(src)) {
+    throw new Error(`Remote image sources are not allowed: ${src}`);
+  }
+  if (/^data:/i.test(src)) {
+    return src;
+  }
+  const raw = src.startsWith('file://') ? decodeURIComponent(src.replace('file://', '')) : src;
+  const resolved = path.resolve(rootDir, raw);
+  const root = path.resolve(rootDir);
+  if (resolved !== root && !resolved.startsWith(root + path.sep)) {
+    throw new Error(`Image source outside the presentation directory is not allowed: ${src}`);
+  }
+  return resolved;
+}
+
 // Helper: Add background to slide
-async function addBackground(slideData, targetSlide, tmpDir) {
+async function addBackground(slideData, targetSlide, tmpDir, rootDir) {
   if (slideData.background.type === 'image' && slideData.background.path) {
-    let imagePath = slideData.background.path.startsWith('file://')
-      ? slideData.background.path.replace('file://', '')
-      : slideData.background.path;
-    targetSlide.background = { path: imagePath };
+    targetSlide.background = { path: resolveImagePath(slideData.background.path, rootDir) };
   } else if (slideData.background.type === 'color' && slideData.background.value) {
     targetSlide.background = { color: slideData.background.value };
   }
 }
 
 // Helper: Add elements to slide
-function addElements(slideData, targetSlide, pres) {
+function addElements(slideData, targetSlide, pres, rootDir) {
   for (const el of slideData.elements) {
     if (el.type === 'image') {
-      let imagePath = el.src.startsWith('file://') ? el.src.replace('file://', '') : el.src;
       targetSlide.addImage({
-        path: imagePath,
+        path: resolveImagePath(el.src, rootDir),
         x: el.position.x,
         y: el.position.y,
         w: el.position.w,
@@ -964,8 +979,8 @@ async function html2pptx(htmlFile, pres, options = {}) {
 
     const targetSlide = slide || pres.addSlide();
 
-    await addBackground(slideData, targetSlide, tmpDir);
-    addElements(slideData, targetSlide, pres);
+    await addBackground(slideData, targetSlide, tmpDir, path.dirname(filePath));
+    addElements(slideData, targetSlide, pres, path.dirname(filePath));
 
     return { slide: targetSlide, placeholders: slideData.placeholders };
   } catch (error) {

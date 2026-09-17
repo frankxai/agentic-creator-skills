@@ -4,16 +4,23 @@ Requires LibreOffice (soffice) to be installed.
 """
 
 import argparse
+import getpass
 import logging
+import os
 import shutil
 import subprocess
+import tempfile
 from pathlib import Path
 
 from office.soffice import get_soffice_env
 
 logger = logging.getLogger(__name__)
 
-LIBREOFFICE_PROFILE = "/tmp/libreoffice_docx_profile"
+# A world-writable, predictable profile path lets another local user pre-plant a
+# Basic macro that this script would then execute. Scope it per-user and 0700.
+LIBREOFFICE_PROFILE = str(
+    Path(tempfile.gettempdir()) / f"libreoffice_docx_profile_{getpass.getuser()}"
+)
 MACRO_DIR = f"{LIBREOFFICE_PROFILE}/user/basic/Standard"
 
 ACCEPT_CHANGES_MACRO = """<?xml version="1.0" encoding="UTF-8"?>
@@ -89,11 +96,15 @@ def accept_changes(
 
 
 def _setup_libreoffice_macro() -> bool:
+    profile_dir = Path(LIBREOFFICE_PROFILE)
     macro_dir = Path(MACRO_DIR)
     macro_file = macro_dir / "Module1.xba"
 
-    if macro_file.exists() and "AcceptAllTrackedChanges" in macro_file.read_text():
-        return True
+    # Refuse a profile we do not own: it may already contain planted macros.
+    if profile_dir.exists() and hasattr(os, "geteuid"):
+        if profile_dir.stat().st_uid != os.geteuid():
+            logger.warning(f"Refusing LibreOffice profile owned by another user: {profile_dir}")
+            return False
 
     if not macro_dir.exists():
         subprocess.run(
@@ -109,6 +120,11 @@ def _setup_libreoffice_macro() -> bool:
             env=get_soffice_env(),
         )
         macro_dir.mkdir(parents=True, exist_ok=True)
+
+    try:
+        profile_dir.chmod(0o700)
+    except OSError:
+        pass
 
     try:
         macro_file.write_text(ACCEPT_CHANGES_MACRO)

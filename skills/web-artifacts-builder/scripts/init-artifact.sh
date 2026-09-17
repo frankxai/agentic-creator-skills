@@ -43,6 +43,14 @@ if [ -z "$1" ]; then
 fi
 
 PROJECT_NAME="$1"
+
+# The name is interpolated into a sed s/// replacement below, where GNU sed's
+# `e` flag would turn a crafted name into shell execution. Also keeps it a
+# valid npm/directory name.
+if ! [[ "$PROJECT_NAME" =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]]; then
+  echo "❌ Error: project name must match ^[A-Za-z0-9][A-Za-z0-9._-]*$"
+  exit 1
+fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 COMPONENTS_TARBALL="$SCRIPT_DIR/shadcn-components.tar.gz"
 
