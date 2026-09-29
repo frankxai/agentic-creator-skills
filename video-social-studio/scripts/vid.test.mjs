@@ -90,6 +90,11 @@ test('cuts snap to nearby sentence boundaries only', () => {
   assert.deepEqual(snapToCues(early, 50, 55), { from: 50, to: 55 }, 'review: no far jump back to 20-22s');
 });
 
+test('re-review: a 40-character word never produces a line over the limit', () => {
+  const out = tidySrt(`1\n00:00:00,000 --> 00:00:04,000\nvisit ${'x'.repeat(40)} today\n`, 60, 32);
+  for (const block of out.trim().split('\n\n')) for (const l of block.split('\n').slice(2)) assert.ok(l.length <= 32, l);
+});
+
 import { filterSafe } from './vid.mjs';
 test('file names with quotes, commas or brackets are staged, plain ones are not', () => {
   assert.equal(filterSafe('C:/clips/talk.srt'), true);

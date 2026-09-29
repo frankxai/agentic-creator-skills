@@ -16,7 +16,7 @@ const has = n => argv.includes(`--${n}`);
 const VALUE_FLAGS = new Set(['from', 'to', 'out', 'db', 'min', 'pad', 'aspect', 'mode', 'x', 'model', 'lang', 'srt', 'style', 'position', 'lufs', 'preset', 'count', 'max-len', 'snap', 'wrap']);
 const positional = argv.slice(1).filter((a, i, all) => !a.startsWith('--') && !VALUE_FLAGS.has((all[i - 1] || '').replace(/^--/, '')));
 const DRY = has('dry-run');
-const CACHE = path.join(os.homedir(), '.cache', 'video-social-studio');
+const CACHE = process.env.VSS_CACHE || path.join(os.homedir(), '.cache', 'video-social-studio');
 
 // Platform presets. Numbers are the common upload targets; platform-specs/references holds the
 // sourced limits, and this table must be updated from there, not from memory.
@@ -161,10 +161,13 @@ export function filterPath(p, cwd = process.cwd()) {
 // Quotes, commas, semicolons, brackets and backslashes need two different escaping levels inside
 // a filter graph. Rather than trust escaping, such files are staged under a plain temp name.
 export const filterSafe = p => !/['",;[\]\\]/.test(path.resolve(p).replace(/\\/g, '/'));
+const staged = [];
+process.on('exit', () => { for (const f of staged) fs.rmSync(f, { force: true }); });
 function stageIn(p) {
   if (filterSafe(p)) return p;
   const tmp = path.join(os.tmpdir(), `vid-${process.pid}-${Date.now()}${path.extname(p)}`);
   fs.copyFileSync(p, tmp);
+  staged.push(tmp);
   return tmp;
 }
 
@@ -188,7 +191,9 @@ export const parseSrt = srt => srt.replace(/\r/g, '').split(/\n\n+/).map(b => {
 export function captionCards(text, maxChars = 32) {
   const cards = [];
   let lines = [''];
-  for (const w of text.split(' ').filter(Boolean)) {
+  // A single token longer than a line (a URL, a hashtag run) is broken into line-sized pieces.
+  const tokens = text.split(' ').filter(Boolean).flatMap(w => w.length <= maxChars ? [w] : w.match(new RegExp(`.{1,${maxChars}}`, 'g')));
+  for (const w of tokens) {
     const cur = lines[lines.length - 1];
     if (!cur) lines[lines.length - 1] = w;
     else if ((cur + ' ' + w).length <= maxChars) lines[lines.length - 1] = `${cur} ${w}`;
@@ -340,7 +345,9 @@ const commands = {
       if (!DRY) await download(MODELS[model], modelPath);
     }
     const lang = flag('lang', 'auto');
-    const dest = filterSafe(out) ? out : path.join(os.tmpdir(), `vid-${process.pid}-${Date.now()}.srt`);
+    // The model is too large to copy per run; an unusual cache path is fixed once with VSS_CACHE.
+    if (!filterSafe(modelPath)) die(`the caption model folder ${CACHE} has a character ffmpeg filters cannot read (quote, comma, semicolon or bracket). Set VSS_CACHE to a plain folder, e.g. C:/vss-cache, and run again.`);
+    const dest = filterSafe(out) ? out :path.join(os.tmpdir(), `vid-${process.pid}-${Date.now()}.srt`);
     ff(['-i', input, '-vn', '-af', `whisper=model=${filterPath(modelPath)}:language=${lang}:queue=10:max_len=${flag('max-len', '42')}:destination=${filterPath(dest)}:format=srt`, '-f', 'null', '-']);
     if (!DRY) {
       const raw = fs.existsSync(dest) ? fs.readFileSync(dest, 'utf8') : '';
@@ -392,6 +399,7 @@ const commands = {
     for (let i = 0; i < count; i++) {
       const t = (duration * (i + 0.5)) / count;
       const f = path.join(dir, `thumb-${String(i + 1).padStart(2, '0')}.jpg`);
+      if (fs.existsSync(f) && !has('overwrite')) die(`${f} already exists. Use a new --out folder, or add --overwrite.`);
       ff(['-ss', t.toFixed(2), '-i', input, '-frames:v', '1', '-q:v', '2', f]);
       files.push(f);
     }
