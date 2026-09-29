@@ -1,0 +1,16 @@
+schema_version: "1.1"
+name: captions-no-trigger-alt-text
+description: "Should NOT trigger captions."
+tags: [trigger, should-not-trigger]
+runs: 1
+execution:
+  prompt: "write alt text for this product photo for my website"
+  max_turns: 4
+  allowed_tools: [Skill, Read]
+graders:
+  - name: skill-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?captions"'
+    min: 0
+    max: 0

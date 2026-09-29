@@ -1,0 +1,16 @@
+schema_version: "1.1"
+name: video-no-trigger-music-prompt
+description: "Should NOT trigger video-edit."
+tags: [trigger, should-not-trigger]
+runs: 1
+execution:
+  prompt: "give me a Suno prompt for a chill lofi track to put under my vlog"
+  max_turns: 4
+  allowed_tools: [Skill, Read]
+graders:
+  - name: skill-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?video-edit"'
+    min: 0
+    max: 0

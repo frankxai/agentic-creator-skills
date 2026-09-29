@@ -1,0 +1,14 @@
+schema_version: "1.1"
+name: shorts-trigger-repurpose-youtube
+description: Should trigger shorts-from-long.
+tags: [trigger, should-trigger]
+runs: 1
+execution:
+  prompt: "repurpose my 20 min YouTube video into shorts with captions: how-i-plan-my-week.mp4"
+  max_turns: 6
+  allowed_tools: [Skill, Read]
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?shorts-from-long"'

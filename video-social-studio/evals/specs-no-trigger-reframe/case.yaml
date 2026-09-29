@@ -1,0 +1,16 @@
+schema_version: "1.1"
+name: specs-no-trigger-reframe
+description: "Should NOT trigger platform-specs. (belongs to another skill)"
+tags: [trigger, should-not-trigger]
+runs: 1
+execution:
+  prompt: "crop my 16:9 cooking video to vertical and keep my face in the center"
+  max_turns: 4
+  allowed_tools: [Skill, Read]
+graders:
+  - name: skill-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?platform-specs"'
+    min: 0
+    max: 0

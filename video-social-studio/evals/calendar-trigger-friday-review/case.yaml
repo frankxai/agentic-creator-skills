@@ -1,0 +1,14 @@
+schema_version: "1.1"
+name: calendar-trigger-friday-review
+description: "Should trigger content-calendar."
+tags: [trigger, should-trigger]
+runs: 1
+execution:
+  prompt: "let's do my friday review, what worked this week and what should I repeat"
+  max_turns: 6
+  allowed_tools: [Skill, Read]
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?content-calendar"'

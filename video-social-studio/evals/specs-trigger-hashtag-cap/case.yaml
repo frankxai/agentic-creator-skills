@@ -1,0 +1,14 @@
+schema_version: "1.1"
+name: specs-trigger-hashtag-cap
+description: "Should trigger platform-specs."
+tags: [trigger, should-trigger]
+runs: 1
+execution:
+  prompt: "how many hashtags am I allowed on instagram these days"
+  max_turns: 6
+  allowed_tools: [Skill, Read]
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?platform-specs"'

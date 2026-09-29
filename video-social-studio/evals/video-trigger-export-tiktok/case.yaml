@@ -1,0 +1,14 @@
+schema_version: "1.1"
+name: video-trigger-export-tiktok
+description: Should trigger video-edit.
+tags: [trigger, should-trigger]
+runs: 1
+execution:
+  prompt: "trim the first 5 seconds where I'm setting up the camera and export it for TikTok"
+  max_turns: 6
+  allowed_tools: [Skill, Read]
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?video-edit"'
