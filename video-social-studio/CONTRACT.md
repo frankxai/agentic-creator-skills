@@ -10,7 +10,7 @@ plain-language reason on failure.
 |---|---|
 | `doctor` | Checks ffmpeg/ffprobe, version, the `whisper`, `subtitles` and `loudnorm` filters, and the caption model; prints the install line for this OS. |
 | `probe <in>` | JSON: duration, width, height, fps, codecs, has audio, rotation. |
-| `trim <in> --from 00:01:02 --to 00:01:40 --out <file>` | Frame-accurate cut. |
+| `trim <in> --from 00:01:02 --to 00:01:40 --out <file> [--snap <file.srt>]` | Frame-accurate cut. `--snap` moves the cut to the nearest sentence start and end. |
 | `silence <in> --out <file> [--db -35] [--min 0.5] [--pad 0.12]` | Jump cuts: removes pauses longer than `--min` seconds. Prints seconds removed. |
 | `reframe <in> --aspect 9:16\|1:1\|4:5\|16:9 --out <file> [--mode crop\|blur] [--x center\|left\|right]` | Changes aspect ratio: center crop, or fit onto a blurred background. |
 | `captions <in> --out <file.srt> [--model base\|small\|tiny] [--lang auto\|en\|nl\|de...] [--max-len 42] [--download-model]` | Transcribes to SRT with ffmpeg's whisper filter, 1–2 lines per cue. The model is cached under `~/.cache/video-social-studio/`. |
@@ -19,4 +19,5 @@ plain-language reason on failure.
 | `export <in> --preset reels\|tiktok\|shorts\|youtube\|linkedin\|x --out <file>` | Aspect, resolution, fps, bitrate, loudness and codec for the platform, in one pass. |
 | `thumbs <in> --count 6 --out <dir>` | Evenly spaced candidate frames as JPGs. |
 | `concat <a> <b> [...] --out <file>` | Joins clips, re-encoding to a common format. |
+| `tidy <file.srt> --out <file.srt> [--video <in>] [--wrap 32]` | Removes overlaps, clamps to the clip, wraps to two short lines. `captions` applies this automatically. |
 | `transcript <file.srt>` | Plain text with timestamps, for choosing hooks and clips. |

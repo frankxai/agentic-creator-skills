@@ -53,3 +53,25 @@ test('length guard: Shorts refuses over 180s, Reels only warns, YouTube has no c
   assert.deepEqual(lengthCheck('youtube', 3600), { ok: true });
   assert.deepEqual(lengthCheck('shorts', 59), { ok: true });
 });
+
+import { tidySrt, parseSrt, snapToCues } from './vid.mjs';
+const messy = [
+  '1', '00:00:00,000 --> 00:00:10,320', 'Today I want to show you how to cook pasta the way my grandmother always did it',
+  '', '2', '00:00:09,980 --> 00:00:43,980', 'with olive oil.', '',
+].join('\n');
+
+test('dogfood: tidy removes overlaps, clamps to the clip, wraps to two lines', () => {
+  const cues = parseSrt(tidySrt(messy, 19, 32));
+  assert.equal(cues[0].end, 7, 'long cue capped at 7s');
+  assert.ok(cues[0].end <= cues[1].start, 'no overlap');
+  assert.ok(cues[1].end <= 19, 'clamped to clip duration');
+  const firstText = tidySrt(messy, 19, 32).split('\n\n')[0].split('\n').slice(2);
+  assert.ok(firstText.length <= 2);
+  assert.ok(firstText[0].length <= 32);
+});
+
+test('dogfood: cuts snap to sentence boundaries', () => {
+  const cues = [{ start: 0, end: 4, text: 'a' }, { start: 4.2, end: 9, text: 'b' }, { start: 9.5, end: 14, text: 'c' }];
+  assert.deepEqual(snapToCues(cues, 5, 12), { from: 4.2, to: 14 });
+  assert.deepEqual(snapToCues(cues, 0, 3), { from: 0, to: 4 });
+});

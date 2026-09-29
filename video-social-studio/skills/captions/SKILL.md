@@ -42,7 +42,7 @@ model.
 ## Step 2: transcribe
 
 ```
-vid.mjs captions <in> --out edited/<name>.srt --model base --lang auto
+vid.mjs captions <in> --out edited/<name>.srt --lang auto   # uses the best model already downloaded; captions come out tidied to 1-2 short lines
 ```
 
 Use `--lang en|nl|de|...` when she tells you the language; it is faster and more accurate than

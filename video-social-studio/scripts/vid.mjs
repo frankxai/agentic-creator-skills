@@ -12,7 +12,7 @@ const argv = process.argv.slice(2);
 const cmd = argv[0];
 const flag = (n, d) => { const i = argv.indexOf(`--${n}`); return i < 0 ? d : argv[i + 1]; };
 const has = n => argv.includes(`--${n}`);
-const VALUE_FLAGS = new Set(['from', 'to', 'out', 'db', 'min', 'pad', 'aspect', 'mode', 'x', 'model', 'lang', 'srt', 'style', 'position', 'lufs', 'preset', 'count', 'max-len']);
+const VALUE_FLAGS = new Set(['from', 'to', 'out', 'db', 'min', 'pad', 'aspect', 'mode', 'x', 'model', 'lang', 'srt', 'style', 'position', 'lufs', 'preset', 'count', 'max-len', 'snap', 'wrap']);
 const positional = argv.slice(1).filter((a, i, all) => !a.startsWith('--') && !VALUE_FLAGS.has((all[i - 1] || '').replace(/^--/, '')));
 const DRY = has('dry-run');
 const CACHE = path.join(os.homedir(), '.cache', 'video-social-studio');
@@ -44,6 +44,7 @@ const MODELS = {
 
 const die = (msg, code = 1) => { console.error(`vid: ${msg}`); process.exit(code); };
 const need = (v, what) => v || die(`missing ${what}. See CONTRACT.md for usage.`, 2);
+const needFile = f => { need(f, 'input file'); if (!fs.existsSync(f)) die(`can't find ${f}. Check the name and folder, or drag the file into the chat.`); return f; };
 const quote = a => (/[\s"'()]/.test(a) ? `"${a.replace(/"/g, '\\"')}"` : a);
 
 function run(bin, args, { capture = false } = {}) {
@@ -58,6 +59,7 @@ function run(bin, args, { capture = false } = {}) {
 const ff = (args, opts) => run('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', ...args], opts);
 
 function safeOut(input, out) {
+  if (DRY && !out) return 'dry-run-output.mp4';
   need(out, '--out');
   if (input && path.resolve(input) === path.resolve(out)) die('--out must differ from the input; originals are never overwritten.');
   fs.mkdirSync(path.dirname(path.resolve(out)), { recursive: true });
@@ -153,6 +155,48 @@ export function filterPath(p, cwd = process.cwd()) {
   return abs.replace(/:/g, '\\\\:');
 }
 
+const srtTime = s => {
+  const ms = Math.max(0, Math.round(s * 1000));
+  const p = (n, w = 2) => String(n).padStart(w, '0');
+  return `${p(Math.floor(ms / 3600000))}:${p(Math.floor(ms / 60000) % 60)}:${p(Math.floor(ms / 1000) % 60)},${p(ms % 1000, 3)}`;
+};
+export const parseSrt = srt => srt.replace(/\r/g, '').split(/\n\n+/).map(b => {
+  const lines = b.split('\n');
+  const i = lines.findIndex(l => l.includes('-->'));
+  if (i < 0) return null;
+  const [a, z] = lines[i].split('-->').map(t => parseTime(t.trim().replace(',', '.')));
+  return { start: a, end: z, text: lines.slice(i + 1).join(' ').replace(/\s+/g, ' ').trim() };
+}).filter(c => c && c.text);
+
+// Small whisper models overlap cues, run the last cue past the clip, and emit lines longer than
+// a phone screen holds. Tidy clamps to the clip, removes overlaps, and wraps to two short lines.
+export function tidySrt(srt, duration = Infinity, maxChars = 32) {
+  const cues = parseSrt(srt);
+  cues.forEach((c, i) => {
+    const next = cues[i + 1];
+    if (next && c.end > next.start) c.end = next.start;
+    c.end = Math.min(c.end, duration, c.start + 7);
+  });
+  const wrap = text => {
+    const words = text.split(' ');
+    const lines = [''];
+    for (const w of words) {
+      const cur = lines[lines.length - 1];
+      if (cur && (cur + ' ' + w).length > maxChars && lines.length < 2) lines.push(w);
+      else lines[lines.length - 1] = cur ? `${cur} ${w}` : w;
+    }
+    return lines.join('\n');
+  };
+  return cues.filter(c => c.end > c.start).map((c, i) => `${i + 1}\n${srtTime(c.start)} --> ${srtTime(c.end)}\n${wrap(c.text)}`).join('\n\n') + '\n';
+}
+
+// Snaps a cut to caption boundaries so a clip never starts or ends mid-sentence.
+export function snapToCues(cues, from, to) {
+  const startCue = [...cues].reverse().find(c => c.start <= from + 0.05) || cues[0];
+  const endCue = cues.find(c => c.end >= to - 0.05) || cues[cues.length - 1];
+  return { from: startCue.start, to: Math.max(endCue.end, startCue.start + 0.5) };
+}
+
 // ffmpeg's whisper filter numbers cues from 0; most editors and platforms expect 1.
 export function renumberSrt(srt) {
   let n = 0;
@@ -204,19 +248,24 @@ const commands = {
     console.log(JSON.stringify(report, null, 1));
   },
 
-  probe() { console.log(JSON.stringify(probe(need(positional[0], 'input file')), null, 1)); },
+  probe() { console.log(JSON.stringify(probe(needFile(positional[0])), null, 1)); },
 
   trim() {
-    const input = need(positional[0], 'input file');
-    const from = parseTime(need(flag('from'), '--from'));
-    const to = parseTime(need(flag('to'), '--to'));
+    const input = needFile(positional[0]);
+    let from = parseTime(need(flag('from'), '--from'));
+    let to = parseTime(need(flag('to'), '--to'));
     if (to <= from) die('--to must be after --from');
+    if (flag('snap')) {
+      const snapped = snapToCues(parseSrt(fs.readFileSync(needFile(flag('snap')), 'utf8')), from, to);
+      console.error(`snapped to sentence boundaries: ${from}-${to}s -> ${snapped.from}-${snapped.to}s`);
+      ({ from, to } = snapped);
+    }
     ff(['-ss', String(from), '-to', String(to), '-i', input, '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '18', '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', safeOut(input, flag('out'))]);
     console.log(`trimmed ${(to - from).toFixed(1)}s -> ${flag('out')}`);
   },
 
   silence() {
-    const input = need(positional[0], 'input file');
+    const input = needFile(positional[0]);
     const out = safeOut(input, flag('out'));
     const info = probe(input);
     if (!info.hasAudio) die('no audio track, nothing to detect pauses in');
@@ -234,16 +283,18 @@ const commands = {
   },
 
   reframe() {
-    const input = need(positional[0], 'input file');
+    const input = needFile(positional[0]);
     const graph = aspectFilter(need(flag('aspect'), '--aspect'), flag('mode', 'crop'), flag('x', 'center'));
     ff(['-i', input, '-filter_complex', graph, '-map', '[v]', '-map', '0:a?', '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '18', '-c:a', 'copy', '-movflags', '+faststart', safeOut(input, flag('out'))]);
     console.log(`reframed to ${flag('aspect')} (${flag('mode', 'crop')}) -> ${flag('out')}`);
   },
 
   async captions() {
-    const input = need(positional[0], 'input file');
+    const input = needFile(positional[0]);
     const out = safeOut(input, flag('out'));
-    const model = flag('model', 'base');
+    // Without --model, use the best model already on disk so a cached tiny never fails as "base missing".
+    const cached = ['small', 'base', 'tiny'].find(m => fs.existsSync(path.join(CACHE, `ggml-${m}.bin`)));
+    const model = flag('model', cached || 'base');
     if (!MODELS[model]) die(`unknown --model ${model}; use tiny, base or small`);
     const modelPath = path.join(CACHE, `ggml-${model}.bin`);
     if (!fs.existsSync(modelPath)) {
@@ -257,14 +308,14 @@ const commands = {
     if (!DRY) {
       const raw = fs.existsSync(out) ? fs.readFileSync(out, 'utf8') : '';
       if (!raw.includes('-->')) die('transcription produced no captions; is there speech in the audio?');
-      const srt = renumberSrt(raw);
+      const srt = tidySrt(renumberSrt(raw), probe(input).duration, Number(flag('wrap', '32')));
       fs.writeFileSync(out, srt);
-      console.log(JSON.stringify({ out, cues: srt.split('\n\n').length, next: 'review the .srt for names and terms, then: vid.mjs burn' }));
+      console.log(JSON.stringify({ out, model, cues: srt.split('\n\n').length, next: 'review the .srt for names and terms, then: vid.mjs burn' }));
     }
   },
 
   burn() {
-    const input = need(positional[0], 'input file');
+    const input = needFile(positional[0]);
     const srt = need(flag('srt'), '--srt');
     if (!fs.existsSync(srt)) die(`no such subtitle file: ${srt}`);
     const style = CAPTION_STYLES[flag('style', 'bold')] || die(`unknown --style; use ${Object.keys(CAPTION_STYLES).join(', ')}`);
@@ -274,13 +325,13 @@ const commands = {
   },
 
   loudness() {
-    const input = need(positional[0], 'input file');
+    const input = needFile(positional[0]);
     ff(['-i', input, '-af', `loudnorm=I=${flag('lufs', '-14')}:TP=-1.5:LRA=11`, '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', safeOut(input, flag('out'))]);
     console.log(`loudness -> ${flag('lufs', '-14')} LUFS -> ${flag('out')}`);
   },
 
   export() {
-    const input = need(positional[0], 'input file');
+    const input = needFile(positional[0]);
     const name = need(flag('preset'), '--preset');
     const p = PRESETS[name] || die(`unknown --preset ${name}; use ${Object.keys(PRESETS).join(', ')}`);
     const graph = `${aspectFilter(p.aspect, flag('mode', 'crop'), flag('x', 'center'), p).replace('[v]', '[vs]')};[vs]fps=${p.fps}[v]`;
@@ -294,7 +345,7 @@ const commands = {
   },
 
   thumbs() {
-    const input = need(positional[0], 'input file');
+    const input = needFile(positional[0]);
     const dir = need(flag('out'), '--out');
     const count = Math.max(1, Number(flag('count', '6')));
     const { duration } = probe(input);
@@ -322,6 +373,15 @@ const commands = {
     console.log(`joined ${inputs.length} clips -> ${out}`);
   },
 
+  tidy() {
+    const srt = needFile(positional[0]);
+    const out = safeOut(srt, flag('out'));
+    const video = flag('video');
+    const tidy = tidySrt(fs.readFileSync(srt, 'utf8'), video ? probe(video).duration : Infinity, Number(flag('wrap', '32')));
+    if (!DRY) fs.writeFileSync(out, tidy);
+    console.log(JSON.stringify({ out, cues: tidy.split('\n\n').length }));
+  },
+
   transcript() {
     const srt = need(positional[0], 'an .srt file');
     console.log(srtToText(fs.readFileSync(srt, 'utf8')));
@@ -335,4 +395,5 @@ if (isMain) {
     process.exit(2);
   }
   await commands[cmd]();
+  if (DRY) console.error('DRY RUN: nothing was written. Run again without --dry-run to do it.');
 }

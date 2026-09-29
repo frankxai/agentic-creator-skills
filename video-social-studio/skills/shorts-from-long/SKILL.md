@@ -28,7 +28,7 @@ node "${CLAUDE_PLUGIN_ROOT}/scripts/vid.mjs" <command> [args]
    `video-edit` and `captions` skills (ask before `--download-model`, ~150 MB for `base`).
 2. `vid.mjs probe <in>` and tell her the length and shape.
 3. Transcribe the whole video once:
-   `vid.mjs captions <in> --out shorts/<name>/full.srt --model base --lang <lang or auto>`
+   `vid.mjs captions <in> --out shorts/<name>/full.srt --lang <lang or auto>`
    Tell her how long it may take. For videos over an hour, suggest she grab a coffee.
 4. `vid.mjs transcript shorts/<name>/full.srt` to get timestamped text you can read.
 
@@ -76,7 +76,7 @@ Then ask: "Which of these should I make? Want to change any start or end point?"
 
 For clip N (keep numbering from the table), chain on the previous output:
 
-1. **Cut:** `vid.mjs trim <in> --from <start> --to <end> --out shorts/<name>/clipN-1-cut.mp4`
+1. **Cut:** `vid.mjs trim <in> --from <start> --to <end> --snap shorts/<name>/full.srt --out shorts/<name>/clipN-1-cut.mp4` (`--snap` moves the cut to the nearest sentence start and end, so a clip never starts mid-word)
 2. **Tighten (optional):** for talking-head clips,
    `vid.mjs silence shorts/<name>/clipN-1-cut.mp4 --out shorts/<name>/clipN-2-tight.mp4 --min 0.4 --pad 0.1`.
    Skip for music or action footage.
