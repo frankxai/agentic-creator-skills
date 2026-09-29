@@ -60,18 +60,40 @@ const messy = [
   '', '2', '00:00:09,980 --> 00:00:43,980', 'with olive oil.', '',
 ].join('\n');
 
-test('dogfood: tidy removes overlaps, clamps to the clip, wraps to two lines', () => {
-  const cues = parseSrt(tidySrt(messy, 19, 32));
-  assert.equal(cues[0].end, 7, 'long cue capped at 7s');
-  assert.ok(cues[0].end <= cues[1].start, 'no overlap');
-  assert.ok(cues[1].end <= 19, 'clamped to clip duration');
-  const firstText = tidySrt(messy, 19, 32).split('\n\n')[0].split('\n').slice(2);
-  assert.ok(firstText.length <= 2);
-  assert.ok(firstText[0].length <= 32);
+test('tidy: no overlaps, clamped to the clip, long cues split into two-line cards', () => {
+  const out = tidySrt(messy, 19, 32);
+  const cues = parseSrt(out);
+  for (let i = 1; i < cues.length; i++) assert.ok(cues[i - 1].end <= cues[i].start + 1e-3, 'no overlap');
+  assert.ok(cues[cues.length - 1].end <= 19, 'clamped to clip duration');
+  for (const block of out.trim().split('\n\n')) {
+    const lines = block.split('\n').slice(2);
+    assert.ok(lines.length <= 2, 'at most two lines');
+    for (const l of lines) assert.ok(l.length <= 32, `line within 32 chars: ${l}`);
+  }
+  assert.ok(cues.length > 2, 'the 80-character cue was split');
 });
 
-test('dogfood: cuts snap to sentence boundaries', () => {
+test('review: a 12-second 20-word cue is split, every line within the limit', () => {
+  const words = Array.from({ length: 20 }, (_, i) => `word${i}`).join(' ');
+  const out = tidySrt(`1\n00:00:00,000 --> 00:00:12,000\n${words}\n`, 60, 32);
+  const cues = parseSrt(out);
+  assert.ok(cues.length >= 3);
+  assert.ok(Math.abs(cues[cues.length - 1].end - 12) < 0.01, 'cards share the full 12s');
+  for (const block of out.trim().split('\n\n')) for (const l of block.split('\n').slice(2)) assert.ok(l.length <= 32);
+});
+
+test('cuts snap to nearby sentence boundaries only', () => {
   const cues = [{ start: 0, end: 4, text: 'a' }, { start: 4.2, end: 9, text: 'b' }, { start: 9.5, end: 14, text: 'c' }];
   assert.deepEqual(snapToCues(cues, 5, 12), { from: 4.2, to: 14 });
   assert.deepEqual(snapToCues(cues, 0, 3), { from: 0, to: 4 });
+  const early = [{ start: 0, end: 10, text: 'x' }, { start: 10, end: 22, text: 'y' }];
+  assert.deepEqual(snapToCues(early, 50, 55), { from: 50, to: 55 }, 'review: no far jump back to 20-22s');
+});
+
+import { filterSafe } from './vid.mjs';
+test('file names with quotes, commas or brackets are staged, plain ones are not', () => {
+  assert.equal(filterSafe('C:/clips/talk.srt'), true);
+  assert.equal(filterSafe('C:/clips/my talk.srt'), true);
+  assert.equal(filterSafe("C:/clips/O'Brien,clips.srt"), false);
+  assert.equal(filterSafe('C:/clips/[final].srt'), false);
 });

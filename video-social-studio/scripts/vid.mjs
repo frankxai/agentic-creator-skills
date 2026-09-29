@@ -7,6 +7,7 @@ import os from 'node:os';
 import path from 'node:path';
 import https from 'node:https';
 import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 
 const argv = process.argv.slice(2);
 const cmd = argv[0];
@@ -62,6 +63,8 @@ function safeOut(input, out) {
   if (DRY && !out) return 'dry-run-output.mp4';
   need(out, '--out');
   if (input && path.resolve(input) === path.resolve(out)) die('--out must differ from the input; originals are never overwritten.');
+  // An earlier edit (or captions she already corrected) is never silently replaced.
+  if (fs.existsSync(out) && !has('overwrite')) die(`${out} already exists. Pick a new name, or add --overwrite if you really want to replace it.`);
   fs.mkdirSync(path.dirname(path.resolve(out)), { recursive: true });
   return out;
 }
@@ -155,6 +158,16 @@ export function filterPath(p, cwd = process.cwd()) {
   return abs.replace(/:/g, '\\\\:');
 }
 
+// Quotes, commas, semicolons, brackets and backslashes need two different escaping levels inside
+// a filter graph. Rather than trust escaping, such files are staged under a plain temp name.
+export const filterSafe = p => !/['",;[\]\\]/.test(path.resolve(p).replace(/\\/g, '/'));
+function stageIn(p) {
+  if (filterSafe(p)) return p;
+  const tmp = path.join(os.tmpdir(), `vid-${process.pid}-${Date.now()}${path.extname(p)}`);
+  fs.copyFileSync(p, tmp);
+  return tmp;
+}
+
 const srtTime = s => {
   const ms = Math.max(0, Math.round(s * 1000));
   const p = (n, w = 2) => String(n).padStart(w, '0');
@@ -170,31 +183,53 @@ export const parseSrt = srt => srt.replace(/\r/g, '').split(/\n\n+/).map(b => {
 
 // Small whisper models overlap cues, run the last cue past the clip, and emit lines longer than
 // a phone screen holds. Tidy clamps to the clip, removes overlaps, and wraps to two short lines.
+// Packs words into caption cards of at most two lines of maxChars each; a word longer than a
+// line gets a line of its own rather than being cut.
+export function captionCards(text, maxChars = 32) {
+  const cards = [];
+  let lines = [''];
+  for (const w of text.split(' ').filter(Boolean)) {
+    const cur = lines[lines.length - 1];
+    if (!cur) lines[lines.length - 1] = w;
+    else if ((cur + ' ' + w).length <= maxChars) lines[lines.length - 1] = `${cur} ${w}`;
+    else if (lines.length < 2) lines.push(w);
+    else { cards.push(lines.join('\n')); lines = [w]; }
+  }
+  if (lines[0]) cards.push(lines.join('\n'));
+  return cards;
+}
+
 export function tidySrt(srt, duration = Infinity, maxChars = 32) {
   const cues = parseSrt(srt);
   cues.forEach((c, i) => {
     const next = cues[i + 1];
     if (next && c.end > next.start) c.end = next.start;
-    c.end = Math.min(c.end, duration, c.start + 7);
+    c.end = Math.min(c.end, duration);
   });
-  const wrap = text => {
-    const words = text.split(' ');
-    const lines = [''];
-    for (const w of words) {
-      const cur = lines[lines.length - 1];
-      if (cur && (cur + ' ' + w).length > maxChars && lines.length < 2) lines.push(w);
-      else lines[lines.length - 1] = cur ? `${cur} ${w}` : w;
+  // A long cue becomes several cards; its time is shared by character count so each card stays
+  // on screen roughly as long as it takes to say.
+  const out = [];
+  for (const c of cues.filter(c => c.end > c.start)) {
+    const cards = captionCards(c.text, maxChars);
+    const total = cards.reduce((n, k) => n + k.length, 0);
+    let t = c.start;
+    for (const k of cards) {
+      const end = t + (c.end - c.start) * (k.length / total);
+      out.push({ start: t, end, text: k });
+      t = end;
     }
-    return lines.join('\n');
-  };
-  return cues.filter(c => c.end > c.start).map((c, i) => `${i + 1}\n${srtTime(c.start)} --> ${srtTime(c.end)}\n${wrap(c.text)}`).join('\n\n') + '\n';
+  }
+  return out.map((c, i) => `${i + 1}\n${srtTime(c.start)} --> ${srtTime(c.end)}\n${c.text}`).join('\n\n') + '\n';
 }
 
-// Snaps a cut to caption boundaries so a clip never starts or ends mid-sentence.
-export function snapToCues(cues, from, to) {
-  const startCue = [...cues].reverse().find(c => c.start <= from + 0.05) || cues[0];
-  const endCue = cues.find(c => c.end >= to - 0.05) || cues[cues.length - 1];
-  return { from: startCue.start, to: Math.max(endCue.end, startCue.start + 0.5) };
+// Snaps a cut to a nearby sentence boundary so a clip never starts or ends mid-word. Only
+// boundaries within `reach` seconds count; with none near, the requested time is kept.
+export function snapToCues(cues, from, to, reach = 2.5) {
+  const starts = cues.filter(c => c.start <= from + 0.05 && c.start >= from - reach);
+  const ends = cues.filter(c => c.end >= to - 0.05 && c.end <= to + reach);
+  const snappedFrom = starts.length ? starts[starts.length - 1].start : from;
+  const snappedTo = ends.length ? ends[0].end : to;
+  return { from: snappedFrom, to: Math.max(snappedTo, snappedFrom + 0.5) };
 }
 
 // ffmpeg's whisper filter numbers cues from 0; most editors and platforms expect 1.
@@ -270,6 +305,7 @@ const commands = {
     const info = probe(input);
     if (!info.hasAudio) die('no audio track, nothing to detect pauses in');
     const det = run('ffmpeg', ['-hide_banner', '-i', input, '-af', `silencedetect=noise=${flag('db', '-35')}dB:d=${flag('min', '0.5')}`, '-f', 'null', '-'], { capture: true });
+    if (det.status !== 0) die(`pause detection failed (check --db and --min):\n${(det.stderr || '').split('\n').slice(-4).join('\n')}`);
     const segs = keepSegments(parseSilences(det.stderr), info.duration, Number(flag('pad', '0.12')));
     if (!segs.length) die('the whole clip reads as silence; try a lower --db such as -45');
     const kept = segs.reduce((n, [a, b]) => n + (b - a), 0);
@@ -304,9 +340,11 @@ const commands = {
       if (!DRY) await download(MODELS[model], modelPath);
     }
     const lang = flag('lang', 'auto');
-    ff(['-i', input, '-vn', '-af', `whisper=model=${filterPath(modelPath)}:language=${lang}:queue=10:max_len=${flag('max-len', '42')}:destination=${filterPath(out)}:format=srt`, '-f', 'null', '-']);
+    const dest = filterSafe(out) ? out : path.join(os.tmpdir(), `vid-${process.pid}-${Date.now()}.srt`);
+    ff(['-i', input, '-vn', '-af', `whisper=model=${filterPath(modelPath)}:language=${lang}:queue=10:max_len=${flag('max-len', '42')}:destination=${filterPath(dest)}:format=srt`, '-f', 'null', '-']);
     if (!DRY) {
-      const raw = fs.existsSync(out) ? fs.readFileSync(out, 'utf8') : '';
+      const raw = fs.existsSync(dest) ? fs.readFileSync(dest, 'utf8') : '';
+      if (dest !== out) fs.rmSync(dest, { force: true });
       if (!raw.includes('-->')) die('transcription produced no captions; is there speech in the audio?');
       const srt = tidySrt(renumberSrt(raw), probe(input).duration, Number(flag('wrap', '32')));
       fs.writeFileSync(out, srt);
@@ -319,7 +357,7 @@ const commands = {
     const srt = need(flag('srt'), '--srt');
     if (!fs.existsSync(srt)) die(`no such subtitle file: ${srt}`);
     const style = CAPTION_STYLES[flag('style', 'bold')] || die(`unknown --style; use ${Object.keys(CAPTION_STYLES).join(', ')}`);
-    const vf = `subtitles=filename=${filterPath(srt)}:force_style='${style},${marginFor(flag('position', 'bottom'))}'`;
+    const vf = `subtitles=filename=${filterPath(stageIn(srt))}:force_style='${style},${marginFor(flag('position', 'bottom'))}'`;
     ff(['-i', input, '-vf', vf, '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '18', '-c:a', 'copy', '-movflags', '+faststart', safeOut(input, flag('out'))]);
     console.log(`captions burned (${flag('style', 'bold')}) -> ${flag('out')}`);
   },
@@ -366,8 +404,12 @@ const commands = {
     const out = safeOut(null, flag('out'));
     const first = probe(inputs[0]);
     const W = first.width, H = first.height;
-    const withAudio = inputs.every(i => probe(i).hasAudio);
-    const norm = inputs.map((_, i) => `[${i}:v]scale=${W}:${H}:force_original_aspect_ratio=decrease,pad=${W}:${H}:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=30[v${i}]` + (withAudio ? `;[${i}:a]aresample=48000[a${i}]` : '')).join(';');
+    // A mute clip gets generated silence of its own length, so one silent clip never drops the
+    // sound of all the others.
+    const infos = inputs.map(i => probe(i));
+    const withAudio = infos.some(x => x.hasAudio);
+    const audioFor = (x, i) => x.hasAudio ? `;[${i}:a]aresample=48000,aformat=channel_layouts=stereo[a${i}]` : `;anullsrc=r=48000:cl=stereo,atrim=duration=${x.duration}[a${i}]`;
+    const norm = infos.map((x, i) => `[${i}:v]scale=${W}:${H}:force_original_aspect_ratio=decrease,pad=${W}:${H}:(ow-iw)/2:(oh-ih)/2,setsar=1,fps=30[v${i}]` + (withAudio ? audioFor(x, i) : '')).join(';');
     const graph = `${norm};${inputs.map((_, i) => `[v${i}]` + (withAudio ? `[a${i}]` : '')).join('')}concat=n=${inputs.length}:v=1:a=${withAudio ? 1 : 0}[v]` + (withAudio ? '[a]' : '');
     ff([...inputs.flatMap(i => ['-i', i]), '-filter_complex', graph, '-map', '[v]', ...(withAudio ? ['-map', '[a]', '-c:a', 'aac', '-b:a', '192k'] : []), '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '18', '-movflags', '+faststart', out]);
     console.log(`joined ${inputs.length} clips -> ${out}`);
@@ -388,7 +430,7 @@ const commands = {
   },
 };
 
-const isMain = process.argv[1] && path.resolve(process.argv[1]) === path.resolve(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1'));
+const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 if (isMain) {
   if (!commands[cmd]) {
     console.error(`usage: node vid.mjs <${Object.keys(commands).join('|')}> [args]   (see CONTRACT.md)`);

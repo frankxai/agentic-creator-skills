@@ -1,8 +1,18 @@
 # Video Social Studio
 
-Your own video editor and social media manager, inside Claude. Tell it what you want in plain
+Your own video assistant and social media manager, inside Claude. Tell it what you want in plain
 words ("cut the pauses", "add captions", "make three shorts from this", "write the Instagram
-post") and it does the work on your computer. Your videos never leave your machine.
+post") and it does the work on your computer.
+
+**Keep the editor you already use.** Export from CapCut, Opus Clip, Descript or your phone as
+usual, then hand the file to Claude: `/post-kit` writes the post for every platform, captions
+come out as an `.srt` you can import anywhere, and `/make-shorts` finds extra clips in videos you
+have already posted. Use the editing commands only when they save you time.
+
+**What stays on your computer:** the video and audio files. Cutting, captioning and exporting all
+run locally with ffmpeg; nothing is uploaded to a video service. **What Claude sees:** the text
+of your captions or transcript and the notes you give it, because that is how it writes your
+posts and picks your best moments. Treat it like any other message you send to Claude.
 
 ## What it does
 
@@ -41,7 +51,9 @@ You can also just describe what you want; you don't need the commands.
 
 ## Good to know
 
-- Every edit is saved as a new file in an `edited/` folder. Your original is never changed.
+- Every edit is saved as a new file in an `edited/` folder. Your original is never changed, and
+  an earlier edit or a caption file you corrected is never replaced unless you say so.
+- Captions are clean static text (bold, clean or minimal), not word-by-word animated captions.
 - Reframing is a centered crop or a blurred-background fit. It does not track your face yet, so
   keep yourself near the middle of the frame when filming for vertical.
 - It never promises reach or invents numbers. Posting times are suggestions to test, not rules.
