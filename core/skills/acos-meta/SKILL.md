@@ -147,5 +147,3 @@ ACOS contributes back to knowledge-work-plugins:
 - `creator/` plugin — creator-specific domain (content, visual, music)
 - Pattern: quality gates in visual and content creation
 - Pattern: music prompt engineering pipeline
-
-See `references/v11-architecture-decisions.md` for the full integration rationale.
