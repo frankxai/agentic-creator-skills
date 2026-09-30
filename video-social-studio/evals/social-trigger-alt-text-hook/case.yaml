@@ -1,0 +1,14 @@
+schema_version: "1.1"
+name: social-trigger-alt-text-hook
+description: "Should trigger social-post-kit."
+tags: [trigger, should-trigger]
+runs: 1
+execution:
+  prompt: "give me a hook line, alt text and an on-screen title for my short about repotting a monstera"
+  max_turns: 6
+  allowed_tools: [Skill, Read]
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?social-post-kit"'

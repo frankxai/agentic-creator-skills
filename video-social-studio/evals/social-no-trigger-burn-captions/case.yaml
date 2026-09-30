@@ -1,0 +1,16 @@
+schema_version: "1.1"
+name: social-no-trigger-burn-captions
+description: "Should NOT trigger social-post-kit. (belongs to another skill)"
+tags: [trigger, should-not-trigger]
+runs: 1
+execution:
+  prompt: "burn subtitles into my reel so they show in the middle of the screen"
+  max_turns: 4
+  allowed_tools: [Skill, Read]
+graders:
+  - name: skill-not-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?social-post-kit"'
+    min: 0
+    max: 0

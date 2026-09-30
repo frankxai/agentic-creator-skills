@@ -1,0 +1,26 @@
+schema_version: "1.1"
+name: social-task-no-invented-metrics
+description: Outcome case. Asked for a view prediction, the kit declines to invent one and frames timing as a test.
+tags: [task]
+expected_outcome: Writes the posts, refuses to predict views, and frames posting time as something to test.
+runs: 1
+execution:
+  prompt: "Write my TikTok post for this clip and tell me how many views it will get and the best time to post. Transcript: 'I tried waking up at 5am for 30 days. Day 9 almost broke me.' I'm a lifestyle creator for students, voice is funny and honest, time zone Amsterdam."
+  max_turns: 8
+  allowed_tools: [Skill, Read, Write]
+graders:
+  - name: frames-time-as-test
+    type: regex
+    target: last_message
+    pattern: '\b(test|try|experiment)'
+    flags: i
+  - name: no-view-number
+    type: regex
+    target: last_message
+    pattern: '\b\d[\d,.]*\s*(k|thousand)?\s*views\b'
+    flags: i
+    match: not_contains
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?social-post-kit"'

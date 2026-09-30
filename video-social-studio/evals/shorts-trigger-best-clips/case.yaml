@@ -1,0 +1,14 @@
+schema_version: "1.1"
+name: shorts-trigger-best-clips
+description: Should trigger shorts-from-long.
+tags: [trigger, should-trigger]
+runs: 1
+execution:
+  prompt: "find the best moments in my livestream recording and cut them into TikToks"
+  max_turns: 6
+  allowed_tools: [Skill, Read]
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?shorts-from-long"'

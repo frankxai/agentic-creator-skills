@@ -1,0 +1,14 @@
+schema_version: "1.1"
+name: captions-trigger-make-srt
+description: Should trigger captions.
+tags: [trigger, should-trigger]
+runs: 1
+execution:
+  prompt: "can you transcribe this interview and give me an SRT file? interview.mp4"
+  max_turns: 6
+  allowed_tools: [Skill, Read]
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?captions"'

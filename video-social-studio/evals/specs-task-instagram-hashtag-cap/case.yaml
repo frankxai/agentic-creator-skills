@@ -1,0 +1,21 @@
+schema_version: "1.1"
+name: specs-task-instagram-hashtag-cap
+description: Outcome case. The answer must give Instagram's 5-hashtag cap from the sourced reference, not the old 30.
+tags: [task]
+expected_outcome: States Instagram allows at most 5 hashtags per post or Reel, and does not recommend 30.
+runs: 1
+execution:
+  prompt: "I usually put 30 hashtags on my reels. Is that still ok on Instagram? Short answer."
+  max_turns: 6
+  allowed_tools: [Skill, Read]
+graders:
+  - name: states-five-cap
+    type: regex
+    target: last_message
+    pattern: '(\b5\b|five)\s+(hashtags|tags)|(up to|max(imum)?( of)?|cap(ped)? (at|of)|limit(ed)? (of|to))\s*(5|five)\b'
+    flags: i
+    weight: 2
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?platform-specs"'

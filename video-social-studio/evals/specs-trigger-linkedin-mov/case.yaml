@@ -1,0 +1,14 @@
+schema_version: "1.1"
+name: specs-trigger-linkedin-mov
+description: "Should trigger platform-specs."
+tags: [trigger, should-trigger]
+runs: 1
+execution:
+  prompt: "linkedin won't take my video straight from my iphone, what format and size does it want?"
+  max_turns: 6
+  allowed_tools: [Skill, Read]
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?platform-specs"'

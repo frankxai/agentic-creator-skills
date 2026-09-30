@@ -1,0 +1,14 @@
+schema_version: "1.1"
+name: social-trigger-all-platforms
+description: "Should trigger social-post-kit."
+tags: [trigger, should-trigger]
+runs: 1
+execution:
+  prompt: "make posts for tiktok, instagram and linkedin from my clip-03.srt, I never know what to write"
+  max_turns: 6
+  allowed_tools: [Skill, Read]
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?social-post-kit"'

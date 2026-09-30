@@ -1,0 +1,29 @@
+{
+  "name": "video-social-studio",
+  "version": "0.1.0",
+  "description": "A local video editor and social media manager for creators. Cuts pauses, adds captions, reframes for vertical, exports for Reels, TikTok, Shorts and LinkedIn, turns long videos into shorts, and writes the post for each platform. Runs on your machine with ffmpeg; nothing is uploaded.",
+  "author": {
+    "name": "frankxai",
+    "url": "https://github.com/frankxai"
+  },
+  "homepage": "https://github.com/frankxai/agentic-creator-skills/tree/main/video-social-studio",
+  "license": "MIT",
+  "keywords": [
+    "video",
+    "captions",
+    "shorts",
+    "reels",
+    "tiktok",
+    "social-media",
+    "ffmpeg",
+    "creator"
+  ],
+  "mcpServers": {
+    "video-social-studio": {
+      "command": "node",
+      "args": [
+        "${CLAUDE_PLUGIN_ROOT}/mcp/server.mjs"
+      ]
+    }
+  }
+}

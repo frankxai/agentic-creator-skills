@@ -1,0 +1,14 @@
+schema_version: "1.1"
+name: social-trigger-caption-reel
+description: "Should trigger social-post-kit."
+tags: [trigger, should-trigger]
+runs: 1
+execution:
+  prompt: "I just finished my reel about meal prep for busy nurses, can you write the caption and hashtags? here's the transcript: 'Sunday, two hours, five lunches. The trick is one tray, three sauces.'"
+  max_turns: 6
+  allowed_tools: [Skill, Read]
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?social-post-kit"'

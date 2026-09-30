@@ -1,0 +1,14 @@
+schema_version: "1.1"
+name: video-trigger-make-vertical
+description: Should trigger video-edit.
+tags: [trigger, should-trigger]
+runs: 1
+execution:
+  prompt: "I filmed this sideways on my camera, make it vertical for Instagram Reels please: cafe-review.mov"
+  max_turns: 6
+  allowed_tools: [Skill, Read]
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?video-edit"'

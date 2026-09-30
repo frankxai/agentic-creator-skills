@@ -6,7 +6,7 @@ This repo is part of the FrankX / Starlight / Arcanea agent estate.
 
 - Repo: agentic-creator-skills
 - Class: public Claude Code plugin marketplace (ACOS — Agentic Creator OS)
-- Default health command: manual SKILL.md frontmatter + link pass (no scripts/validate-skills.mjs in this repo)
+- Default health command: `claude plugin validate --strict .` (marketplace and every plugin), plus `node --test video-social-studio/scripts/vid.test.mjs` for the video engine
 - Remote: https://github.com/frankxai/agentic-creator-skills.git
 
 ## Agent Rules
@@ -40,3 +40,7 @@ For any site, app, landing page, dashboard, visual identity, brand, motion, medi
 
 When motion, scroll, generated media, GIF/video, or premium polish matters, route through the Motion Design Studio plugin/skills and verify the result visually.
 
+
+## GenCreator packs
+
+New creator packs follow the `gencreator-product-team` profile (starlight-agent-config `core/teams/`): one named creator and her weekly job, research the tool she pays for, a deterministic engine script for mechanical work plus skills for judgment, a `creator-dogfood-tester` run on real media, a `skill-judge` eval, and a second-provider review before the draft PR is marked ready. `video-social-studio/` is the reference pack. Never publish, price or post on a creator's behalf.
