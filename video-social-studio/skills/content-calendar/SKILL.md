@@ -86,25 +86,32 @@ After the table, list what has to happen for each row, in order, e.g.:
 Write `week-<monday-date>.md` to her working folder with the pillars, clip list, matrix and next
 steps.
 
-Ask whether she uses a scheduler. If yes, also write `week-<monday-date>.csv`, one row per post
-per platform, UTF-8, comma-separated, text in double quotes:
+Always write `week-<monday-date>-plan.csv`, her own planning sheet (not a scheduler import),
+one row per post per platform, UTF-8, comma-separated, text in double quotes:
 
 ```csv
 posting_time,platform,pillar,clip_file,hook,caption,hashtags,status
 "2026-10-06 19:00","instagram","Quick wins","clip-02-garlic.mp4","Stop peeling garlic like this","","#garlic #cookinghacks #weeknightdinner","draft"
 ```
 
-- `posting_time` uses `YYYY-MM-DD HH:mm`, 24-hour, which is the format Buffer's bulk upload asks
-  for (https://support.buffer.com/article/926-how-to-upload-posts-in-bulk-to-buffer, read
-  2026-09-29).
-- Buffer imports one channel at a time: tell her to filter by `platform` and save one CSV per
-  channel.
-- Metricool wants its own template with fixed columns and TRUE/FALSE per network
+Leave `caption` empty until `social-post-kit` has written it, then fill it in.
+
+**Schedulers.** Say this plainly first: bulk CSV imports in Buffer and Metricool do not carry
+video files. Her clips get attached post by post inside the scheduler (or posted from her phone).
+The CSV only saves typing the captions and times.
+
+- **Buffer:** its bulk upload accepts only the columns `Text`, `Image URL`, `Tags` and
+  `Posting Time` (exact, case-sensitive), with `Posting Time` as `YYYY-MM-DD HH:mm` in 24-hour
+  time, and supports text and single-image posts, not video
+  (https://support.buffer.com/article/926-how-to-upload-posts-in-bulk-to-buffer, read
+  2026-09-30). If she wants it, write `week-<monday-date>-buffer-<platform>.csv` per channel with
+  exactly those four columns: `Text` = hook + caption + hashtags, `Posting Time` from the plan,
+  `Image URL` and `Tags` empty. Explain that each row lands as a text draft she then opens in
+  Buffer to attach the clip before it goes out.
+- **Metricool:** it uses its own template with fixed columns and TRUE/FALSE per network
   (https://help.metricool.com/en/article/how-to-schedule-posts-in-batch-with-a-csv-file-in-metricool-3wihqx/,
-  read 2026-09-29). Tell her to download it from Metricool and paste our columns in; don't reorder
-  theirs.
-- Leave `caption` empty until `social-post-kit` has written it, then fill it in.
-- Video files usually have to be attached in the scheduler itself. Say so, so she isn't surprised.
+  read 2026-09-29). Tell her to download it from Metricool and copy the caption and time columns
+  from the plan into it; don't reorder theirs.
 
 ## Part B. The Friday 15-minute review
 
