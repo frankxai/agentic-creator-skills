@@ -40,9 +40,11 @@ posts and picks your best moments. Treat it like any other message you send to C
 
 The first time you ask for captions it offers to download a speech model once (about 150 MB).
 
-**Using Claude chat instead of Claude Code?** The plugin also ships a small local tool server,
-so Claude can run the same edits from a chat where it cannot use a terminal. Start with "check my
-video setup", which runs the setup check.
+**Using Claude Desktop chat instead of Claude Code?** Installing the plugin in Claude Code does
+not add it to Desktop chat; the two have separate tool settings. The plugin ships a small local
+tool server (`mcp/server.mjs`) you can add to Claude Desktop yourself, under Settings, Developer,
+local tool servers (command `node`, argument: the full path to `mcp/server.mjs`). Then ask "check
+my video setup" to confirm it works.
 
 ## Commands
 

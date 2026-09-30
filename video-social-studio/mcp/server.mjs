@@ -11,6 +11,9 @@ import { fileURLToPath } from 'node:url';
 
 const VID = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'scripts', 'vid.mjs');
 const SERVER = { name: 'video-social-studio', version: '0.1.0' };
+// Newest first. 2026-07-28 is stateless (no initialize); older clients negotiate via initialize.
+const LEGACY_VERSIONS = ['2025-06-18', '2025-03-26', '2024-11-05'];
+const SUPPORTED_VERSIONS = ['2026-07-28', ...LEGACY_VERSIONS];
 
 const str = (description) => ({ type: 'string', description });
 const TOOLS = [
@@ -27,12 +30,30 @@ const TOOLS = [
 
 const listTools = () => TOOLS.map(t => ({ name: t.name, description: t.description, inputSchema: { type: 'object', properties: t.props, required: t.required, additionalProperties: false } }));
 
+// Every value becomes an argv entry for vid.mjs, so each is checked against its declared type,
+// and a string starting with '-' is refused: it would be read as an option, not a file or time.
+export function validateArgs(tool, args) {
+  const errors = [];
+  for (const [k, v] of Object.entries(args || {})) {
+    const spec = tool.props[k];
+    if (!spec) { errors.push(`unknown argument ${k}`); continue; }
+    if (spec.type === 'string' && typeof v !== 'string') errors.push(`${k} must be text`);
+    if (spec.type === 'string' && typeof v === 'string' && v.startsWith('-')) errors.push(`${k} cannot start with "-"`);
+    if (spec.enum && !spec.enum.includes(v)) errors.push(`${k} must be one of ${spec.enum.join(', ')}`);
+    if (spec.type === 'boolean' && typeof v !== 'boolean') errors.push(`${k} must be true or false`);
+    if (spec.type === 'integer' && !(Number.isInteger(v) && v >= (spec.minimum ?? -Infinity) && v <= (spec.maximum ?? Infinity))) errors.push(`${k} must be a whole number in range`);
+  }
+  return errors;
+}
+
 export function callTool(name, args = {}) {
   const tool = TOOLS.find(t => t.name === name);
   if (!tool) return { isError: true, content: [{ type: 'text', text: `Unknown tool ${name}.` }] };
   const missing = tool.required.filter(k => args[k] === undefined || args[k] === '');
   if (missing.length) return { isError: true, content: [{ type: 'text', text: `Missing: ${missing.join(', ')}.` }] };
-  const r = spawnSync(process.execPath, [VID, ...tool.argv(args)], { encoding: 'utf8', cwd: args.cwd || process.cwd(), maxBuffer: 16 * 1024 * 1024 });
+  const invalid = validateArgs(tool, args);
+  if (invalid.length) return { isError: true, content: [{ type: 'text', text: `Invalid: ${invalid.join('; ')}.` }] };
+  const r = spawnSync(process.execPath, [VID, ...tool.argv(args)], { encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 });
   const vidLines = (r.stderr || '').split(/\r?\n/).filter(l => l.startsWith('vid:') || l.startsWith('warning:') || l.startsWith('snapped'));
   const text = [(r.stdout || '').trim(), ...vidLines].filter(Boolean).join('\n') || (r.status === 0 ? 'Done.' : 'It did not work; run video_doctor.');
   return { isError: r.status !== 0, content: [{ type: 'text', text }] };
@@ -42,9 +63,10 @@ function handle(msg) {
   const { id, method, params } = msg;
   switch (method) {
     case 'initialize':
-      return { protocolVersion: params?.protocolVersion || '2025-06-18', capabilities: { tools: {} }, serverInfo: SERVER };
+      // Legacy handshake: agree on the requested version only if this server implements it.
+      return { protocolVersion: LEGACY_VERSIONS.includes(params?.protocolVersion) ? params.protocolVersion : LEGACY_VERSIONS[0], capabilities: { tools: {} }, serverInfo: SERVER };
     case 'server/discover':
-      return { serverInfo: SERVER, capabilities: { tools: {} } };
+      return { supportedVersions: SUPPORTED_VERSIONS, serverInfo: SERVER, capabilities: { tools: {} } };
     case 'ping':
       return {};
     case 'tools/list':

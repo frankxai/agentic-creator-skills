@@ -10,6 +10,13 @@ test('unknown tools and missing arguments are plain tool errors, not crashes', (
   assert.match(r.content[0].text, /Missing: output, from, to/);
 });
 
+test('review: option-like, wrongly typed or unknown arguments are refused before vid.mjs runs', () => {
+  assert.match(callTool('video_info', { input: '--help' }).content[0].text, /cannot start with "-"/);
+  assert.match(callTool('video_info', { input: 42 }).content[0].text, /must be text/);
+  assert.match(callTool('video_export', { input: 'a.mp4', output: 'b.mp4', platform: 'myspace' }).content[0].text, /must be one of/);
+  assert.match(callTool('video_info', { input: 'a.mp4', cwd: 'C:/' }).content[0].text, /unknown argument cwd/);
+});
+
 test('the engine safety rules reach the client: an original is never overwritten', () => {
   const r = callTool('video_export', { input: 'x.mp4', output: 'x.mp4', platform: 'reels' });
   assert.equal(r.isError, true);
