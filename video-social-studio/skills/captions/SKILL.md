@@ -24,12 +24,15 @@ See `${CLAUDE_PLUGIN_ROOT}/CONTRACT.md` for the full command list.
 
 ## Step 1: check the tools
 
-Run `vid.mjs doctor`. Captions need ffmpeg 8 or newer with the `whisper` filter, plus a speech
-model.
+Run `vid.mjs doctor`. Captions need a speech recogniser plus a speech model. The recogniser is
+either ffmpeg's built-in `whisper` filter (the Windows full build has it) or whisper.cpp
+(`whisper-cli`), which `vid.mjs` uses automatically when the filter is missing. `doctor` says
+which one it found.
 
-- **ffmpeg too old or no whisper filter:** explain "your video tool works, but it's an older
-  version without the built-in speech recogniser". Update: Windows `winget upgrade Gyan.FFmpeg`,
-  macOS `brew upgrade ffmpeg`. Then run `doctor` again.
+- **No recogniser:** explain "your video tool works, but there's no speech recogniser yet".
+  Install one, then run `doctor` again: Windows `winget upgrade Gyan.FFmpeg`; macOS
+  `brew install whisper-cpp` (Homebrew's ffmpeg never includes the filter, so upgrading ffmpeg
+  does not help); Linux: install whisper.cpp so `whisper-cli` is on PATH.
 - **No model yet:** explain it plainly and ask:
   > "To turn speech into text on your own computer I need to download a speech model once. The
   > standard one is about 150 MB and is stored in `~/.cache/video-social-studio/`. Nothing about
