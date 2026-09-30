@@ -104,10 +104,13 @@ The CSV only saves typing the captions and times.
   `Posting Time` (exact, case-sensitive), with `Posting Time` as `YYYY-MM-DD HH:mm` in 24-hour
   time, and supports text and single-image posts, not video
   (https://support.buffer.com/article/926-how-to-upload-posts-in-bulk-to-buffer, read
-  2026-09-30). If she wants it, write `week-<monday-date>-buffer-<platform>.csv` per channel with
-  exactly those four columns: `Text` = hook + caption + hashtags, `Posting Time` from the plan,
-  `Image URL` and `Tags` empty. Explain that each row lands as a text draft she then opens in
-  Buffer to attach the clip before it goes out.
+  2026-09-30). Instagram, TikTok and YouTube posts need media, so a text-only row for those
+  channels is rejected: for them, skip the CSV and have her paste the caption from the plan when
+  she uploads the clip. Only for channels that accept text posts (LinkedIn, X, Threads, Facebook
+  pages), and only if she wants it, write `week-<monday-date>-buffer-<platform>.csv` with exactly
+  those four columns: `Text` = hook + caption + hashtags, `Posting Time` from the plan,
+  `Image URL` and `Tags` empty. Each row lands as a text post; to post the clip instead, she opens
+  it in Buffer and attaches the video before it goes out.
 - **Metricool:** it uses its own template with fixed columns and TRUE/FALSE per network
   (https://help.metricool.com/en/article/how-to-schedule-posts-in-batch-with-a-csv-file-in-metricool-3wihqx/,
   read 2026-09-29). Tell her to download it from Metricool and copy the caption and time columns
