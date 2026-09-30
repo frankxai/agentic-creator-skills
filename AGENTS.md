@@ -4,10 +4,10 @@ This repo is part of the FrankX / Starlight / Arcanea agent estate.
 
 ## Classification
 
-- Repo: agentic-creator-skills
+- Repo: gencreator-skills (renamed from agentic-creator-skills; GitHub redirects the old URL)
 - Class: public Claude Code plugin marketplace (ACOS — Agentic Creator OS)
 - Default health command: `claude plugin validate --strict .` (marketplace and every plugin), plus `node --test video-social-studio/scripts/vid.test.mjs` for the video engine
-- Remote: https://github.com/frankxai/agentic-creator-skills.git
+- Remote: https://github.com/frankxai/gencreator-skills.git
 
 ## Agent Rules
 

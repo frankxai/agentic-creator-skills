@@ -1,9 +1,9 @@
 ﻿{
-    "name":  "agentic-creator-skills",
+    "name":  "gencreator-skills",
     "classification":  "agent-substrate",
     "owner":  "FrankX AI",
     "updated":  "2026-06-19",
-    "remote":  "https://github.com/frankxai/agentic-creator-skills.git",
+    "remote":  "https://github.com/frankxai/gencreator-skills.git",
     "health":  {
                    "primaryCheck":  "git status",
                    "manualChecks":  [

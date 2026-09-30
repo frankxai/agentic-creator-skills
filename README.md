@@ -7,22 +7,22 @@
 ## Install ACOS Plugins
 
 ```bash
-claude plugin marketplace add frankxai/agentic-creator-skills
+claude plugin marketplace add frankxai/gencreator-skills
 ```
 
 ### Full ACOS (everything):
 ```bash
-claude plugin install core content-engine visual-studio music-lab brand-architect product-launcher intelligence@agentic-creator-skills
+claude plugin install core content-engine visual-studio music-lab brand-architect product-launcher intelligence@gencreator-skills
 ```
 
 ### Minimal setup (workspace + content):
 ```bash
-claude plugin install core content-engine brand-architect@agentic-creator-skills
+claude plugin install core content-engine brand-architect@gencreator-skills
 ```
 
 ### Single module:
 ```bash
-claude plugin install music-lab@agentic-creator-skills
+claude plugin install music-lab@gencreator-skills
 ```
 
 **After installing core, run:** `/creator-sprint`
@@ -59,8 +59,8 @@ Each plugin is a vertical slice of creator capability:
 ## Update
 
 ```bash
-claude plugin marketplace update agentic-creator-skills
-claude plugin update core@agentic-creator-skills
+claude plugin marketplace update gencreator-skills
+claude plugin update core@gencreator-skills
 ```
 
 ---
@@ -70,8 +70,8 @@ claude plugin update core@agentic-creator-skills
 This repo also contains the original Anthropic agent skills library:
 
 ```bash
-claude plugin install example-skills@agentic-creator-skills
-claude plugin install document-skills@agentic-creator-skills
+claude plugin install example-skills@gencreator-skills
+claude plugin install document-skills@gencreator-skills
 ```
 
 > For information about the Agent Skills standard, see [agentskills.io](http://agentskills.io).
