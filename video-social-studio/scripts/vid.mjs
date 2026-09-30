@@ -182,12 +182,18 @@ export function captionBackend(filters) {
 
 const staged = [];
 process.on('exit', () => { for (const f of staged) fs.rmSync(f, { force: true }); });
-function stageIn(p) {
-  if (filterSafe(p)) return p;
-  const tmp = path.join(os.tmpdir(), `vid-${process.pid}-${Date.now()}${path.extname(p)}`);
-  fs.copyFileSync(p, tmp);
-  staged.push(tmp);
-  return tmp;
+// A plain file name relative to the working folder is always filter-safe, however the user's
+// profile or project folders are named (a temp dir inside C:\Users\O'Brien is not). ffmpeg runs
+// in the working folder, so staged files live there under a plain name and are passed relatively.
+const plainName = ext => `.vid-stage-${process.pid}-${Date.now()}${ext}`;
+export function filterArg(p) {
+  if (filterSafe(p)) return filterPath(p);
+  const rel = path.relative(process.cwd(), p).replace(/\\/g, '/');
+  if (rel && !rel.startsWith('..') && !/['",;[\]\\:]/.test(rel)) return rel;
+  const name = plainName(path.extname(p));
+  fs.copyFileSync(p, name);
+  staged.push(path.resolve(name));
+  return name;
 }
 
 const srtTime = s => {
@@ -388,8 +394,9 @@ const commands = {
     }
     // The model is too large to copy per run; an unusual cache path is fixed once with VSS_CACHE.
     if (!filterSafe(modelPath)) die(`the caption model folder ${CACHE} has a character ffmpeg filters cannot read (quote, comma, semicolon or bracket). Set VSS_CACHE to a plain folder, e.g. C:/vss-cache, and run again.`);
-    const dest = filterSafe(out) ? out :path.join(os.tmpdir(), `vid-${process.pid}-${Date.now()}.srt`);
-    ff(['-i', input, '-vn', '-af', `whisper=model=${filterPath(modelPath)}:language=${lang}:queue=10:max_len=${flag('max-len', '42')}:destination=${filterPath(dest)}:format=srt`, '-f', 'null', '-']);
+    const dest = filterSafe(out) ? out : plainName('.srt');
+    if (dest !== out) staged.push(path.resolve(dest));
+    ff(['-i', input, '-vn', '-af', `whisper=model=${filterPath(modelPath)}:language=${lang}:queue=10:max_len=${flag('max-len', '42')}:destination=${dest === out ? filterPath(dest) : dest}:format=srt`, '-f', 'null', '-']);
     if (!DRY) {
       const raw = fs.existsSync(dest) ? fs.readFileSync(dest, 'utf8') : '';
       if (dest !== out) fs.rmSync(dest, { force: true });
@@ -405,7 +412,7 @@ const commands = {
     const srt = need(flag('srt'), '--srt');
     if (!fs.existsSync(srt)) die(`no such subtitle file: ${srt}`);
     const style = CAPTION_STYLES[flag('style', 'bold')] || die(`unknown --style; use ${Object.keys(CAPTION_STYLES).join(', ')}`);
-    const vf = `subtitles=filename=${filterPath(stageIn(srt))}:force_style='${style},${marginFor(flag('position', 'bottom'))}'`;
+    const vf = `subtitles=filename=${filterArg(srt)}:force_style='${style},${marginFor(flag('position', 'bottom'))}'`;
     ff(['-i', input, '-vf', vf, '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '18', '-c:a', 'copy', '-movflags', '+faststart', safeOut(input, flag('out'))]);
     console.log(`captions burned (${flag('style', 'bold')}) -> ${flag('out')}`);
   },
