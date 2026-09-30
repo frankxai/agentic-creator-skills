@@ -33,8 +33,8 @@ posts and picks your best moments. Treat it like any other message you send to C
    - Linux: `sudo apt install ffmpeg`, plus [whisper.cpp](https://github.com/ggml-org/whisper.cpp) for captions
 2. **Add the plugin in Claude Code:**
    ```
-   /plugin marketplace add frankxai/agentic-creator-skills
-   /plugin install video-social-studio@agentic-creator-skills
+   /plugin marketplace add frankxai/gencreator-skills
+   /plugin install video-social-studio@gencreator-skills
    ```
 3. **Say hi:** open a folder with your videos and type `/edit-video`. The first thing it does is
    check your setup and tell you, in plain words, if anything is missing.
@@ -65,4 +65,4 @@ You can also just describe what you want; you don't need the commands.
   keep yourself near the middle of the frame when filming for vertical.
 - It never promises reach or invents numbers. Posting times are suggestions to test, not rules.
 
-Part of [Agentic Creator Skills](https://github.com/frankxai/agentic-creator-skills) by GenCreator.
+Part of [GenCreator Skills](https://github.com/frankxai/gencreator-skills) by GenCreator.
