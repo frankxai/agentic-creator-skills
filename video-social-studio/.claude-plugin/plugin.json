@@ -8,5 +8,22 @@
   },
   "homepage": "https://github.com/frankxai/agentic-creator-skills/tree/main/video-social-studio",
   "license": "MIT",
-  "keywords": ["video", "captions", "shorts", "reels", "tiktok", "social-media", "ffmpeg", "creator"]
+  "keywords": [
+    "video",
+    "captions",
+    "shorts",
+    "reels",
+    "tiktok",
+    "social-media",
+    "ffmpeg",
+    "creator"
+  ],
+  "mcpServers": {
+    "video-social-studio": {
+      "command": "node",
+      "args": [
+        "${CLAUDE_PLUGIN_ROOT}/mcp/server.mjs"
+      ]
+    }
+  }
 }

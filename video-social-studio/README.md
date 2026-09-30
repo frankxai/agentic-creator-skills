@@ -40,6 +40,10 @@ posts and picks your best moments. Treat it like any other message you send to C
 
 The first time you ask for captions it offers to download a speech model once (about 150 MB).
 
+**Using Claude chat instead of Claude Code?** The plugin also ships a small local tool server,
+so Claude can run the same edits from a chat where it cannot use a terminal. Start with "check my
+video setup", which runs the setup check.
+
 ## Commands
 
 - `/edit-video` for everyday edits
