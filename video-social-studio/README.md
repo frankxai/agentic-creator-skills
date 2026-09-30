@@ -29,7 +29,8 @@ posts and picks your best moments. Treat it like any other message you send to C
 
 1. **Install ffmpeg**, the free video engine it uses.
    - Windows: open Terminal and run `winget install Gyan.FFmpeg`
-   - Mac: install [Homebrew](https://brew.sh), then run `brew install ffmpeg`
+   - Mac: install [Homebrew](https://brew.sh), then run `brew install ffmpeg whisper-cpp` (the second one powers captions)
+   - Linux: `sudo apt install ffmpeg`, plus [whisper.cpp](https://github.com/ggml-org/whisper.cpp) for captions
 2. **Add the plugin in Claude Code:**
    ```
    /plugin marketplace add frankxai/agentic-creator-skills

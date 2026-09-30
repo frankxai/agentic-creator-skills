@@ -38,7 +38,7 @@ Run `node "${CLAUDE_PLUGIN_ROOT}/scripts/vid.mjs" doctor`.
 - ffmpeg missing: walk her through it, one step at a time.
   - **Windows:** open PowerShell and run `winget install Gyan.FFmpeg`, then close and reopen the
     terminal (and Claude Code) so the new command is found.
-  - **macOS:** `brew install ffmpeg` (if `brew` is missing, install Homebrew from https://brew.sh first).
+  - **macOS:** `brew install ffmpeg whisper-cpp` (if `brew` is missing, install Homebrew from https://brew.sh first). Homebrew ffmpeg has no built-in captioning, so `whisper-cpp` provides it.
   - Then run `doctor` again to confirm. Don't run the installer for her unless she asks you to.
 - Only the caption parts missing (whisper filter or model): editing still works. Mention it once,
   and hand over to the `captions` skill when she wants subtitles.

@@ -161,6 +161,25 @@ export function filterPath(p, cwd = process.cwd()) {
 // Quotes, commas, semicolons, brackets and backslashes need two different escaping levels inside
 // a filter graph. Rather than trust escaping, such files are staged under a plain temp name.
 export const filterSafe = p => !/['",;[\]\\]/.test(path.resolve(p).replace(/\\/g, '/'));
+// Per-OS setup. Homebrew and apt ffmpeg are built without --enable-whisper, so outside Windows
+// captions come from whisper.cpp (brew formula whisper-cpp, binary whisper-cli), which reads the
+// same ggml models this script downloads.
+export const INSTALL = {
+  win32: { ffmpeg: 'winget install Gyan.FFmpeg', captions: 'winget install Gyan.FFmpeg (its full build includes the whisper filter)' },
+  darwin: { ffmpeg: 'brew install ffmpeg', captions: 'brew install whisper-cpp' },
+  linux: { ffmpeg: 'sudo apt install ffmpeg', captions: 'install whisper.cpp so `whisper-cli` is on PATH (see github.com/ggml-org/whisper.cpp)' },
+};
+
+export function captionBackend(filters) {
+  const list = filters ?? (spawnSync('ffmpeg', ['-hide_banner', '-filters'], { encoding: 'utf8' }).stdout || '');
+  if (/\swhisper\s/.test(list)) return { kind: 'filter' };
+  for (const bin of ['whisper-cli', 'whisper-cpp']) {
+    const r = spawnSync(bin, ['-h'], { encoding: 'utf8' });
+    if (!r.error) return { kind: 'cli', bin };
+  }
+  return null;
+}
+
 const staged = [];
 process.on('exit', () => { for (const f of staged) fs.rmSync(f, { force: true }); });
 function stageIn(p) {
@@ -273,16 +292,21 @@ export function srtToText(srt) {
 
 const commands = {
   doctor() {
-    const install = process.platform === 'win32' ? 'winget install Gyan.FFmpeg' : process.platform === 'darwin' ? 'brew install ffmpeg' : 'sudo apt install ffmpeg';
+    const install = INSTALL[process.platform] || INSTALL.linux;
     const v = spawnSync('ffmpeg', ['-version'], { encoding: 'utf8' });
-    if (v.error) { console.log(JSON.stringify({ ok: false, ffmpeg: 'missing', fix: install }, null, 1)); process.exit(1); }
+    if (v.error) { console.log(JSON.stringify({ ok: false, ffmpeg: 'missing', fix: install.ffmpeg }, null, 1)); process.exit(1); }
     const version = (v.stdout.match(/ffmpeg version (\S+)/) || [])[1];
     const filters = spawnSync('ffmpeg', ['-hide_banner', '-filters'], { encoding: 'utf8' }).stdout || '';
     const hasF = n => new RegExp(`\\s${n}\\s`).test(filters);
     const models = fs.existsSync(CACHE) ? fs.readdirSync(CACHE).filter(f => f.endsWith('.bin')) : [];
     const report = {
       ok: true, ffmpeg: version, ffprobe: !spawnSync('ffprobe', ['-version']).error,
-      captions: hasF('whisper') ? (models.length ? `ready (${models.join(', ')})` : 'filter ready; model not downloaded yet (captions --download-model)') : 'this ffmpeg has no whisper filter: install ffmpeg 8+ full build (' + install + ') for local captions',
+      captions: (() => {
+        const backend = captionBackend(filters);
+        if (!backend) return `not available: this ffmpeg has no whisper filter and whisper.cpp is not installed. Fix: ${install.captions}`;
+        const via = backend.kind === 'filter' ? 'ffmpeg whisper filter' : `whisper.cpp (${backend.bin})`;
+        return models.length ? `ready via ${via} (${models.join(', ')})` : `${via} ready; model not downloaded yet (captions --download-model)`;
+      })(),
       burnCaptions: hasF('subtitles'), loudness: hasF('loudnorm'), cache: CACHE,
     };
     console.log(JSON.stringify(report, null, 1));
@@ -345,6 +369,23 @@ const commands = {
       if (!DRY) await download(MODELS[model], modelPath);
     }
     const lang = flag('lang', 'auto');
+    const backend = captionBackend();
+    if (!backend) die(`captions need either an ffmpeg with the whisper filter or whisper.cpp. Fix: ${(INSTALL[process.platform] || INSTALL.linux).captions}`);
+    if (backend.kind === 'cli') {
+      // Homebrew and apt ffmpeg ship without the whisper filter; whisper.cpp reads the same model.
+      const base = path.join(os.tmpdir(), `vid-${process.pid}-${Date.now()}`);
+      ff(['-i', input, '-vn', '-ac', '1', '-ar', '16000', '-c:a', 'pcm_s16le', `${base}.wav`]);
+      run(backend.bin, ['-m', modelPath, '-f', `${base}.wav`, '-osrt', '-of', base, '-l', lang, '-ml', flag('max-len', '42'), '-sow', '-np']);
+      if (!DRY) {
+        const raw = fs.existsSync(`${base}.srt`) ? fs.readFileSync(`${base}.srt`, 'utf8') : '';
+        for (const f of [`${base}.wav`, `${base}.srt`]) fs.rmSync(f, { force: true });
+        if (!raw.includes('-->')) die('transcription produced no captions; is there speech in the audio?');
+        const srt = tidySrt(renumberSrt(raw), probe(input).duration, Number(flag('wrap', '32')));
+        fs.writeFileSync(out, srt);
+        console.log(JSON.stringify({ out, model, via: backend.bin, cues: srt.split('\n\n').length, next: 'review the .srt for names and terms, then: vid.mjs burn' }));
+      }
+      return;
+    }
     // The model is too large to copy per run; an unusual cache path is fixed once with VSS_CACHE.
     if (!filterSafe(modelPath)) die(`the caption model folder ${CACHE} has a character ffmpeg filters cannot read (quote, comma, semicolon or bracket). Set VSS_CACHE to a plain folder, e.g. C:/vss-cache, and run again.`);
     const dest = filterSafe(out) ? out :path.join(os.tmpdir(), `vid-${process.pid}-${Date.now()}.srt`);

@@ -102,3 +102,12 @@ test('file names with quotes, commas or brackets are staged, plain ones are not'
   assert.equal(filterSafe("C:/clips/O'Brien,clips.srt"), false);
   assert.equal(filterSafe('C:/clips/[final].srt'), false);
 });
+
+import { captionBackend, INSTALL } from './vid.mjs';
+test('grok review: captions pick the ffmpeg filter when present, else whisper.cpp, else a per-OS fix', () => {
+  assert.deepEqual(captionBackend(' .. whisper           A->A       Transcribe audio'), { kind: 'filter' });
+  const none = captionBackend(' .. loudnorm  A->A ');
+  assert.ok(none === null || none.kind === 'cli', 'without the filter it falls back to whisper.cpp or reports none');
+  assert.match(INSTALL.darwin.captions, /whisper-cpp/);
+  assert.match(INSTALL.linux.captions, /whisper-cli/);
+});
