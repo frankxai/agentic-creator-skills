@@ -56,6 +56,18 @@ my video setup" to confirm it works.
 
 You can also just describe what you want; you don't need the commands.
 
+## What it runs and connects to
+
+- **Runs:** `ffmpeg` and `ffprobe` on your computer, plus `whisper-cli` (whisper.cpp) for
+  captions when your ffmpeg has no built-in captioning. The plugin's own code is two readable
+  Node.js files, `scripts/vid.mjs` and the tool server `mcp/server.mjs`, each with a test file.
+  Nothing is minified and nothing is installed from a package registry.
+- **Connects to:** one place, once, and only after you say yes: the speech model for captions is
+  downloaded from `huggingface.co/ggerganov/whisper.cpp` into `~/.cache/video-social-studio/`.
+  Nothing else goes over the network.
+- **Sends:** nothing. Your videos, transcripts and posts stay on your computer. It never posts to
+  a social account; you copy the post text and upload the video yourself.
+
 ## Good to know
 
 - Every edit is saved as a new file in an `edited/` folder. Your original is never changed, and
