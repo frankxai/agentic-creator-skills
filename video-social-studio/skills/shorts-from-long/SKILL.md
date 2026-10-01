@@ -9,11 +9,15 @@ Opus Clip, Submagic Magic Clips and CapCut AutoCut do this in the cloud for a mo
 does it on her computer, in her words, with her say over every clip. See
 [references/research.md](references/research.md) for what they do well and where we differ.
 
-All video work goes through the plugin script (full list in `${CLAUDE_PLUGIN_ROOT}/CONTRACT.md`):
+All video work goes through the `video-engine` script:
 
 ```
-node "${CLAUDE_PLUGIN_ROOT}/scripts/vid.mjs" <command> [args]
+node "<skills-folder>/video-engine/scripts/vid.mjs" <command> [args]
 ```
+
+`<skills-folder>` is the folder this skill sits in; `video-engine` is its sibling. Below,
+`vid.mjs` means this command. If `video-engine` is missing, say so and stop. The command list is
+in `<skills-folder>/video-engine/references/contract.md`.
 
 ## House rules
 

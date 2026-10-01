@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Stdio MCP server for video-social-studio, so the engine works in chat surfaces that call MCP
 // tools but cannot run shell commands (Claude Desktop, Cowork). Every tool is a thin, typed
-// wrapper over scripts/vid.mjs: same safety rules (originals never overwritten, plain errors).
+// wrapper over skills/video-engine/scripts/vid.mjs: same safety rules (originals never overwritten, plain errors).
 // No dependencies. Answers both the stateless 2026-07-28 flow (server/discover, tools/*) and
 // the older initialize handshake, so current and older clients both connect.
 import { spawnSync } from 'node:child_process';
@@ -9,7 +9,7 @@ import { createInterface } from 'node:readline';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const VID = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'scripts', 'vid.mjs');
+const VID = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'skills', 'video-engine', 'scripts', 'vid.mjs');
 const SERVER = { name: 'video-social-studio', version: '0.1.0' };
 // Newest first. 2026-07-28 is stateless (no initialize); older clients negotiate via initialize.
 const LEGACY_VERSIONS = ['2025-06-18', '2025-03-26', '2024-11-05'];

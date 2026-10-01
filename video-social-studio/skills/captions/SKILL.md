@@ -6,13 +6,15 @@ description: "Adds subtitles to a video, privately on her own computer: transcri
 # Captions
 
 Transcribe, review together, burn in. All on her machine: no upload, no subscription, no
-watermark. Every step runs through the plugin script:
+watermark. Every step runs through the `video-engine` script:
 
 ```
-node "${CLAUDE_PLUGIN_ROOT}/scripts/vid.mjs" <command> [args]
+node "<skills-folder>/video-engine/scripts/vid.mjs" <command> [args]
 ```
 
-See `${CLAUDE_PLUGIN_ROOT}/CONTRACT.md` for the full command list.
+`<skills-folder>` is the folder this skill sits in; `video-engine` is its sibling. Below,
+`vid.mjs` means this command. If `video-engine` is missing, say so and stop. The full command
+list is in `<skills-folder>/video-engine/references/contract.md`.
 
 ## House rules
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // vid.mjs — the one deterministic video engine every video-social-studio skill drives.
 // Skills decide *what* to cut; this script decides *how*, so an edit is reproducible and the
-// exact ffmpeg command is always shown. Contract: ../CONTRACT.md. Needs only ffmpeg on PATH.
+// exact ffmpeg command is always shown. Contract: ../references/contract.md. Needs only ffmpeg on PATH.
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -44,7 +44,7 @@ const MODELS = {
 };
 
 const die = (msg, code = 1) => { console.error(`vid: ${msg}`); process.exit(code); };
-const need = (v, what) => v || die(`missing ${what}. See CONTRACT.md for usage.`, 2);
+const need = (v, what) => v || die(`missing ${what}. See references/contract.md for usage.`, 2);
 const needFile = f => { need(f, 'input file'); if (!fs.existsSync(f)) die(`can't find ${f}. Check the name and folder, or drag the file into the chat.`); return f; };
 const quote = a => (/[\s"'()]/.test(a) ? `"${a.replace(/"/g, '\\"')}"` : a);
 
@@ -489,7 +489,7 @@ const commands = {
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 if (isMain) {
   if (!commands[cmd]) {
-    console.error(`usage: node vid.mjs <${Object.keys(commands).join('|')}> [args]   (see CONTRACT.md)`);
+    console.error(`usage: node vid.mjs <${Object.keys(commands).join('|')}> [args]   (see references/contract.md)`);
     process.exit(2);
   }
   await commands[cmd]();

@@ -1,7 +1,9 @@
 # vid.mjs command contract
 
-Every skill in this plugin drives video through one deterministic script:
-`node ${CLAUDE_PLUGIN_ROOT}/scripts/vid.mjs <command> [args]`. Requires ffmpeg on PATH
+Every skill in this pack drives video through one deterministic script:
+`node "<skills-folder>/video-engine/scripts/vid.mjs" <command> [args]`, where `<skills-folder>`
+holds the video skills side by side (`${CLAUDE_PLUGIN_ROOT}/skills` when installed as a plugin).
+Requires ffmpeg on PATH
 (captions need ffmpeg 8+ with the `whisper` filter, or whisper.cpp `whisper-cli` on PATH as the automatic fallback). Every command prints the exact ffmpeg
 command it runs, accepts `--dry-run`, never overwrites its input, and exits non-zero with a
 plain-language reason on failure.
