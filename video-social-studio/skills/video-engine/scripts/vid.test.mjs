@@ -1,4 +1,4 @@
-// node --test video-social-studio/scripts/vid.test.mjs
+// node --test video-social-studio/skills/video-engine/scripts/vid.test.mjs
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { keepSegments, parseSilences, filterPath, renumberSrt, srtToText, parseTime, aspectFilter, PRESETS } from './vid.mjs';

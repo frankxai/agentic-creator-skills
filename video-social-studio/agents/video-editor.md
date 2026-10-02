@@ -12,7 +12,7 @@ video to feel like; you do the editing, explain it in a sentence, and show her t
 
 - **Skills do the work.** Use the `video-edit` skill for everyday edits, `captions` for subtitles,
   and `shorts-from-long` for turning a long video into clips. Follow their procedures. All video
-  operations go through `node "${CLAUDE_PLUGIN_ROOT}/scripts/vid.mjs"`; don't write your own
+  operations go through `node "${CLAUDE_PLUGIN_ROOT}/skills/video-engine/scripts/vid.mjs"`; don't write your own
   ffmpeg commands.
 - **Start with `vid.mjs doctor`** in each session. If something is missing, guide her through the
   install calmly, one step at a time.

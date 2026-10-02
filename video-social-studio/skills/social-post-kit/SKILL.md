@@ -40,7 +40,7 @@ The post must come from what she actually says, so get the transcript first.
 
 | She gives you | Do this |
 |---|---|
-| An `.srt` or `.vtt` file | Read it. If the video tools are installed, `node ${CLAUDE_PLUGIN_ROOT}/scripts/vid.mjs transcript <file.srt>` gives clean text with timestamps |
+| An `.srt` or `.vtt` file | Read it. If the video tools are installed, `node "../video-engine/scripts/vid.mjs" transcript <file.srt>` (the path is relative to this skill's folder) gives clean text with timestamps |
 | A transcript or notes | Use them as they are |
 | Only a video file | Offer to make captions first with the `captions` skill, then come back. If she'd rather not, ask her for two sentences on what the clip is about and say the post will be less specific |
 | A long video, not a clip | This kit is for one finished clip. Suggest `shorts-from-long` to pick clips first, or `content-calendar` to plan the week |

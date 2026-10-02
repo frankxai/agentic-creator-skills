@@ -41,6 +41,16 @@ posts and picks your best moments. Treat it like any other message you send to C
 
 The first time you ask for captions it offers to download a speech model once (about 150 MB).
 
+**Using Codex, Gemini CLI, Cursor or another agent?** The skills work there too. They share one
+engine, `video-engine`, so install it with the ones you want:
+
+```
+npx skills add frankxai/gencreator-skills -s video-engine -s video-edit -s captions -s shorts-from-long -s platform-specs -s social-post-kit
+```
+
+The slash commands and the video-editor agent are Claude Code only; in other agents, describe
+what you want.
+
 **Using Claude Desktop chat instead of Claude Code?** Installing the plugin in Claude Code does
 not add it to Desktop chat; the two have separate tool settings. The plugin ships a small local
 tool server (`mcp/server.mjs`) you can add to Claude Desktop yourself, under Settings, Developer,
@@ -60,7 +70,8 @@ You can also just describe what you want; you don't need the commands.
 
 - **Runs:** `ffmpeg` and `ffprobe` on your computer, plus `whisper-cli` (whisper.cpp) for
   captions when your ffmpeg has no built-in captioning. The plugin's own code is two readable
-  Node.js files, `scripts/vid.mjs` and the tool server `mcp/server.mjs`, each with a test file.
+  Node.js files, `skills/video-engine/scripts/vid.mjs` and the tool server `mcp/server.mjs`, each
+  with a test file.
   Nothing is minified and nothing is installed from a package registry.
 - **Connects to:** one place, once, and only after you say yes: the speech model for captions is
   downloaded from `huggingface.co/ggerganov/whisper.cpp` into `~/.cache/video-social-studio/`.

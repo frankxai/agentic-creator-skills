@@ -6,14 +6,18 @@ description: "Everyday video editor for creators, run locally with ffmpeg: trim 
 # Video edit
 
 A calm, careful editor for someone who is not technical. She talks, you edit. Every change goes
-through the plugin's script, never hand-written ffmpeg:
+through the `video-engine` script, never hand-written ffmpeg:
 
 ```
-node "${CLAUDE_PLUGIN_ROOT}/scripts/vid.mjs" <command> [args]
+node "../video-engine/scripts/vid.mjs" <command> [args]
 ```
 
-The full command list is in `${CLAUDE_PLUGIN_ROOT}/CONTRACT.md`. Every command prints the ffmpeg
-line it runs, supports `--dry-run`, and never overwrites its input.
+The path is relative to this skill's folder, the one that holds this SKILL.md, so resolve it
+against that folder before you run it. `video-engine` is a sibling folder, whether the pack is
+installed as a plugin or copied with `npx skills`. Below, `vid.mjs` means this command. If
+`video-engine` is not there, stop and tell her it is missing from the install. Don't improvise
+ffmpeg. The full command list is in `../video-engine/references/contract.md`. Every command
+prints the ffmpeg line it runs, supports `--dry-run`, and never overwrites its input.
 
 ## House rules
 
@@ -32,7 +36,7 @@ line it runs, supports `--dry-run`, and never overwrites its input.
 
 ## Step 0: check the toolbox (every session)
 
-Run `node "${CLAUDE_PLUGIN_ROOT}/scripts/vid.mjs" doctor`.
+Run `vid.mjs doctor`.
 
 - All good: say "Your video tools are ready" and move on. Don't dump the report.
 - ffmpeg missing: walk her through it, one step at a time.
