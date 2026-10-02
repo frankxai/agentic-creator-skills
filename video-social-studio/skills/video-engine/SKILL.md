@@ -11,11 +11,13 @@ on the creator's computer and uploads nothing.
 ## Run it
 
 ```
-node "<skills-folder>/video-engine/scripts/vid.mjs" <command> [args]
+node "scripts/vid.mjs" <command> [args]
 ```
 
-`<skills-folder>` is the folder this skill sits in. The other video skills call the same path, so
-`video-engine` has to stay next to them, as a plugin and as copied skills. Commands and options are
+The path is relative to this skill's folder, the one that holds this SKILL.md; resolve it against
+that folder before you run it. The other video skills reach the same script as
+`../video-engine/scripts/vid.mjs`, so `video-engine` has to stay next to them, as a plugin and as
+copied skills. Commands and options are
 in `references/contract.md`. Run `vid.mjs` with no arguments to see the command list; don't invent
 flags that aren't there.
 

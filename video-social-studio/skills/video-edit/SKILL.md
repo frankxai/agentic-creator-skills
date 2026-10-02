@@ -9,14 +9,15 @@ A calm, careful editor for someone who is not technical. She talks, you edit. Ev
 through the `video-engine` script, never hand-written ffmpeg:
 
 ```
-node "<skills-folder>/video-engine/scripts/vid.mjs" <command> [args]
+node "../video-engine/scripts/vid.mjs" <command> [args]
 ```
 
-`<skills-folder>` is the folder this skill sits in: `video-engine` is its sibling, whether the
-pack is installed as a plugin or copied with `npx skills`. Below, `vid.mjs` means this command.
-If `video-engine` is not there, stop and tell her it is missing from the install. Don't improvise
-ffmpeg. The full command list is in `<skills-folder>/video-engine/references/contract.md`. Every
-command prints the ffmpeg line it runs, supports `--dry-run`, and never overwrites its input.
+The path is relative to this skill's folder, the one that holds this SKILL.md, so resolve it
+against that folder before you run it. `video-engine` is a sibling folder, whether the pack is
+installed as a plugin or copied with `npx skills`. Below, `vid.mjs` means this command. If
+`video-engine` is not there, stop and tell her it is missing from the install. Don't improvise
+ffmpeg. The full command list is in `../video-engine/references/contract.md`. Every command
+prints the ffmpeg line it runs, supports `--dry-run`, and never overwrites its input.
 
 ## House rules
 

@@ -47,7 +47,7 @@ Point to the reference for the numbers, but this is the advice that rarely chang
 When she has an exported clip and asks "is this OK for TikTok?":
 
 1. If the video tools in this plugin are available, run
-   `node "<skills-folder>/video-engine/scripts/vid.mjs" probe <file>` (`<skills-folder>` is the folder this skill sits in; if `video-engine` is not next to it, ask her for the length and size instead) to get duration, size and aspect.
+   `node "../video-engine/scripts/vid.mjs" probe <file>` (the path is relative to this skill's folder; if `video-engine` is not a sibling there, ask her for the length and size instead) to get duration, size and aspect.
 2. Compare each value to the platform's row. Report only what fails or is close, for example:
    "Length is fine. It's 4:5, not 9:16, so TikTok will add bars top and bottom."
 3. For a fix, hand over to the video skills (`vid.mjs reframe` or `vid.mjs export --preset`).
