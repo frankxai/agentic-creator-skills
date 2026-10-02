@@ -1,0 +1,35 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "gencreator-native",
+  "version": "0.1.0-alpha.1",
+  "description": "Portable source-to-edition and launch workflows with local execution.",
+  "author": {
+    "name": "GenCreator",
+    "url": "https://gencreator.ai"
+  },
+  "homepage": "https://gencreator.ai",
+  "repository": "https://github.com/frankxai/gencreator-skills",
+  "license": "MIT",
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "GenCreator",
+        "shortDescription": "Create a source-linked content week and launch packet.",
+        "longDescription": "Local source-to-edition production and launch workflows. Includes exact evidence and revision checks, editable drafts, and a dependency-free launch runtime. Optional remote MCP uses the existing GenCreator public endpoint; managed workspace access is not available until OAuth/readiness passes.",
+        "developerName": "GenCreator",
+        "category": "Productivity",
+        "capabilities": [
+          "Read"
+        ],
+        "websiteURL": "https://gencreator.ai",
+        "privacyPolicyURL": "https://gencreator.ai/privacy",
+        "termsOfServiceURL": "https://gencreator.ai/terms",
+        "defaultPrompt": [
+          "Use GenCreator to turn this transcript into a reviewed content week.",
+          "Build a source-backed launch packet for this offer."
+        ]
+      }
+    }
+  }
+}
+
